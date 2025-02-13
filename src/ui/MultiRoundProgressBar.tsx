@@ -1,5 +1,7 @@
 // MultiRoundProgressBar.tsx
+
 import React from "react";
+import { Box } from "@mui/material";
 import { TimerItem } from "../dataFlow/TimerListModel";
 
 function sumRoundTimers(round: TimerItem[]): number {
@@ -10,15 +12,8 @@ function sumAllRounds(rounds: TimerItem[][]): number {
   return rounds.reduce((acc, round) => acc + sumRoundTimers(round), 0);
 }
 
-// Можно задать несколько цветов и идти по кругу
-const timerColors = [
-  "#ff9999",
-  "#99ff99",
-  "#9999ff",
-  "#ffff99",
-  "#ff99ff",
-  "#99ffff",
-];
+// Набор цветов для таймеров (выбираем по индексу)
+const timerColors = ["#074799", "#009990", "#E1FFBB"];
 
 interface MultiRoundProgressBarProps {
   rounds: TimerItem[][];
@@ -36,13 +31,15 @@ export const MultiRoundProgressBar: React.FC<MultiRoundProgressBarProps> = ({
   const total = sumAllRounds(rounds);
 
   return (
-    <div
-      style={{
-        width: "600px",
-        height: "30px",
-        background: "#eee",
+    <Box
+      sx={{
+        width: "100%", // ТУТ делаем "полноширинный" адаптивный блок
+        height: 50,
+        backgroundColor: "#eee",
         display: "flex",
-        border: "1px solid #ccc",
+        border: "5px solid white",
+        borderRadius: 20,
+        overflow: "hidden",
       }}
     >
       {rounds.map((round, rIndex) => {
@@ -50,13 +47,13 @@ export const MultiRoundProgressBar: React.FC<MultiRoundProgressBarProps> = ({
         const roundWidthPct = (roundDuration / total) * 100;
 
         return (
-          <div
+          <Box
             key={rIndex}
-            style={{
+            sx={{
               width: `${roundWidthPct}%`,
               display: "flex",
               borderRight:
-                rIndex < rounds.length - 1 ? "2px solid #000" : "none",
+                rIndex < rounds.length - 1 ? "5px solid #F95454" : "none",
               position: "relative",
             }}
           >
@@ -65,7 +62,7 @@ export const MultiRoundProgressBar: React.FC<MultiRoundProgressBarProps> = ({
 
               let fillPct = 0;
               if (rIndex < currentRoundIndex) {
-                // Раунд полностью завершён
+                // Раунд завершён
                 fillPct = 100;
               } else if (rIndex === currentRoundIndex) {
                 // Текущий раунд
@@ -80,33 +77,33 @@ export const MultiRoundProgressBar: React.FC<MultiRoundProgressBarProps> = ({
               const baseColor = timerColors[tIndex % timerColors.length];
 
               return (
-                <div
+                <Box
                   key={tIndex}
-                  style={{
+                  sx={{
                     width: `${timerWidthPct}%`,
                     height: "100%",
-                    background: baseColor,
-                    borderLeft: tIndex > 0 ? "1px solid #aaa" : "none",
+                    backgroundColor: baseColor,
                     position: "relative",
                   }}
                 >
-                  <div
-                    style={{
+                  {/* "Залитая" часть — overlay поверх базового цвета */}
+                  <Box
+                    sx={{
                       position: "absolute",
                       left: 0,
                       top: 0,
                       bottom: 0,
                       width: `${fillPct}%`,
-                      backgroundColor: "rgba(0,0,0,0.2)", // затемнение
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
                       transition: "width 0.1s linear",
                     }}
                   />
-                </div>
+                </Box>
               );
             })}
-          </div>
+          </Box>
         );
       })}
-    </div>
+    </Box>
   );
 };
