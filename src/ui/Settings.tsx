@@ -13,7 +13,6 @@ import {
   Box,
   Button,
   IconButton,
-  Typography,
 } from "@mui/material";
 
 interface IProps {
@@ -91,9 +90,18 @@ export const Settings: React.FC<IProps> = ({ rounds, setRounds }) => {
       }}
     >
       <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
+        expandIcon={
+          <ExpandMoreIcon
+            style={{
+              color: "white",
+            }}
+          />
+        }
         aria-controls="panel1-content"
         id="panel1-header"
+        style={{
+          height: 48,
+        }}
       >
         <Box
           style={{

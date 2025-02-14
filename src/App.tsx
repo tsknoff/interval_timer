@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import EventNoteIcon from "@mui/icons-material/EventNote";
 
 import { TimerItem } from "./dataFlow/TimerListModel";
 import { RoundListModel } from "./dataFlow/RoundListModel";
@@ -214,23 +215,83 @@ export const App: React.FC = () => {
         overflow: "auto",
       }}
     >
-      <Box sx={{ width: "60vw", padding: "1rem", marginBottom: "2rem" }}>
-        <Box sx={{ marginBottom: "1rem" }}>
+      <Box
+        sx={{
+          padding: "1rem",
+          marginBottom: "2rem",
+          display: "flex",
+          flexDirection: "row",
+          gap: 10,
+          flexWrap: "wrap-reverse",
+        }}
+      >
+        {/* Journal */}
+        <Box
+          style={{
+            color: "white",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            fontFamily: "sans-serif",
+            border: "1px solid white",
+            borderRadius: 16,
+            height: "calc(100vh - 10rem)",
+            overflowY: "scroll",
+            gap: 10,
+            padding: 10,
+            paddingTop: 0,
+          }}
+        >
+          <Box
+            style={{
+              alignContent: "center",
+              display: "flex",
+              alignItems: "center",
+              backgroundColor: "#023385",
+              width: "100%",
+              position: "sticky",
+              top: 0,
+              gap: 8,
+              zIndex: 1,
+            }}
+          >
+            <EventNoteIcon />
+            <h2>Training Journal</h2>
+          </Box>
+
+          {journal.length === 0 && <p>No records yet.</p>}
+          {journal
+            .sort((a, b) => b.date.localeCompare(a.date))
+            .map((rec, i) => (
+              <JournalNote key={i} journalRecord={rec} />
+            ))}
+        </Box>
+        <Box
+          sx={{
+            marginBottom: "1rem",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 3,
+          }}
+        >
           <Box
             sx={{
               width: "100%",
               display: "flex",
               alignItems: "center",
-              flexDirection: "column",
-              gap: 2,
+              justifyContent: "center",
+              flexDirection: "row",
+              flexWrap: "wrap",
+              gap: 20,
             }}
           >
             <Box
               sx={{
                 borderRadius: "50%",
-                width: 200,
-                height: 200,
-                border: "1px solid #ccc",
+                width: 300,
+                height: 300,
+                border: "10px solid #ccc",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -240,10 +301,10 @@ export const App: React.FC = () => {
               <Typography sx={{ color: "white" }}>
                 <strong>Round {roundIndex + 1}</strong> / {roundsTotal}
               </Typography>
-              <Typography sx={{ color: "white", fontSize: 20 }}>
+              <Typography sx={{ color: "white", fontSize: 30 }}>
                 <strong>{timerName}</strong>
               </Typography>
-              <Typography sx={{ color: "white", fontSize: 20 }}>
+              <Typography sx={{ color: "white", fontSize: 40 }}>
                 <strong>{secondsLeft} sec</strong>
               </Typography>
             </Box>
@@ -258,16 +319,29 @@ export const App: React.FC = () => {
                 alignItems: "stretch",
                 width: "100%",
                 maxWidth: 400,
+                border: "1px solid white",
+                borderRadius: 4,
+                fontFamily: "sans-serif",
+                color: "white",
+                paddingLeft: 3,
+                paddingRight: 3,
               }}
             >
+              <h2>Workout details</h2>
               <Box
                 style={{
                   display: "flex",
                   flexDirection: "row",
+                  gap: 8,
                 }}
               >
                 <FormControl fullWidth>
-                  <InputLabel sx={{ backgroundColor: "#fff" }}>
+                  <InputLabel
+                    style={{
+                      color: "white",
+                      backgroundColor: "transparent",
+                    }}
+                  >
                     Technique
                   </InputLabel>
                   <Select
@@ -277,8 +351,12 @@ export const App: React.FC = () => {
                     sx={{
                       backgroundColor: "white",
                     }}
-                    variant={"outlined"}
+                    variant="outlined"
                     size={"small"}
+                    style={{
+                      color: "white",
+                      backgroundColor: "transparent",
+                    }}
                   >
                     <MenuItem value="Warmup">Warmup</MenuItem>
                     <MenuItem value="Steps">Steps</MenuItem>
@@ -299,8 +377,11 @@ export const App: React.FC = () => {
                   size="small"
                   value={pattern}
                   onChange={(e) => setPattern(e.target.value)}
+                  InputLabelProps={{
+                    style: { color: "#fff" },
+                  }}
                   sx={{
-                    backgroundColor: "white",
+                    input: { color: "white" },
                   }}
                 />
               </Box>
@@ -311,67 +392,71 @@ export const App: React.FC = () => {
                 size="small"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                InputLabelProps={{
+                  style: { color: "#fff" },
+                }}
                 sx={{
-                  backgroundColor: "white",
+                  input: { color: "white" },
                 }}
               />
               {/* Settings для редактирования rounds */}
               <Settings rounds={rounds} setRounds={setRounds} />
-            </Box>
-
-            {/* BPM */}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                gap: 1,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <img
-                src={"assets/metronome.svg"}
-                alt={"metronome"}
-                style={{ width: 20, height: 20, marginRight: 5 }}
-              />
-              <Typography sx={{ color: "white" }}>
-                <strong>BPM: {bpm}</strong>
-              </Typography>
-              <Slider
-                value={bpm}
-                onChange={(e, newValue) => setBpm(newValue as number)}
-                min={70}
-                max={150}
-                step={1}
-                sx={{ width: 200 }}
-              />
-            </Box>
-
-            {/* Кнопки Start/Reset */}
-            <Box
-              sx={{
-                marginBottom: 2,
-                display: "flex",
-                flexDirection: "row",
-                gap: 2,
-              }}
-            >
-              <Button
-                startIcon={<PlayArrowIcon />}
-                variant="contained"
-                sx={{ backgroundColor: "#001A6E" }}
-                onClick={handleStart}
+              {/* BPM */}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
-                Start
-              </Button>
-              <Button
-                startIcon={<RestartAltIcon />}
-                variant="outlined"
-                sx={{ backgroundColor: "white" }}
-                onClick={handleReset}
+                <img
+                  src={"assets/metronome.svg"}
+                  alt={"metronome"}
+                  style={{ width: 20, height: 20, marginRight: 5 }}
+                />
+                <Typography sx={{ color: "white" }}>
+                  <strong>BPM: {bpm}</strong>
+                </Typography>
+                <Slider
+                  value={bpm}
+                  onChange={(e, newValue) => setBpm(newValue as number)}
+                  min={70}
+                  max={150}
+                  step={1}
+                  sx={{ width: 200 }}
+                />
+              </Box>
+
+              {/* Кнопки Start/Reset */}
+              <Box
+                sx={{
+                  marginBottom: 2,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 2,
+                }}
               >
-                Reset
-              </Button>
+                <Button
+                  startIcon={<PlayArrowIcon />}
+                  variant="contained"
+                  sx={{ backgroundColor: "#001A6E" }}
+                  onClick={handleStart}
+                >
+                  Start
+                </Button>
+                <Button
+                  startIcon={<RestartAltIcon />}
+                  variant="outlined"
+                  sx={{ backgroundColor: "white" }}
+                  onClick={handleReset}
+                >
+                  Reset
+                </Button>
+              </Box>
             </Box>
           </Box>
 
@@ -381,19 +466,7 @@ export const App: React.FC = () => {
             currentTimerIndex={timerIndex}
             timerRemaining={timerRemaining}
           />
-        </Box>
-
-        <ActivityGrid journalRecords={journal} />
-
-        {/* Journal */}
-        <Box sx={{ color: "white", mt: 3 }}>
-          <Typography variant="h6" sx={{ color: "white" }}>
-            Training Journal
-          </Typography>
-          {journal.length === 0 && <p>No records yet.</p>}
-          {journal.map((rec, i) => (
-            <JournalNote key={i} journalRecord={rec} />
-          ))}
+          <ActivityGrid journalRecords={journal} />
         </Box>
       </Box>
 

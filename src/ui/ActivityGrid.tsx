@@ -188,7 +188,12 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
   //  - под каждым столбцом (или нигде) — года, если нужно
 
   return (
-    <div style={{ display: "flex", color: "white" }}>
+    <div
+      style={{
+        display: "flex",
+        color: "white",
+      }}
+    >
       {/* Колонка с подписями дней (7 штук) */}
       <div style={{ marginRight: 8, marginTop: 18 }}>
         {dayLabels.map((label, idx) => (

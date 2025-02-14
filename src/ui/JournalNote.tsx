@@ -123,10 +123,12 @@ export const JournalNote: FC<IProps> = ({ journalRecord }) => {
 
   return (
     <Card
-      sx={{
+      style={{
         marginBottom: 2,
         backgroundColor: theme.palette.background.paper,
         color: theme.palette.text.primary,
+        width: 400,
+        minHeight: "fit-content",
       }}
     >
       <CardContent>
