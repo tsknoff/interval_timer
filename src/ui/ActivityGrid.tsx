@@ -1,7 +1,7 @@
 // ActivityGrid.tsx
 import { FC, useMemo } from "react";
 import { JournalRecord } from "../App.tsx";
-import { duration } from "@mui/material";
+import { Box } from "@mui/material";
 
 interface IActivityGridProps {
   journalRecords: JournalRecord[];
@@ -188,103 +188,116 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
   //  - под каждым столбцом (или нигде) — года, если нужно
 
   return (
-    <div
+    <Box
       style={{
-        display: "flex",
-        color: "white",
+        width: "100%",
+        minWidth: "100px",
+        overflow: "auto",
+        border: "1px solid #ccc",
+        padding: 16,
+        borderRadius: 4,
       }}
     >
-      {/* Колонка с подписями дней (7 штук) */}
-      <div style={{ marginRight: 8, marginTop: 18 }}>
-        {dayLabels.map((label, idx) => (
-          <div
-            key={label}
-            style={{
-              height: 14, // совпадает с квадратиком + margin (14+2?)
-              marginBottom: 2,
-              fontSize: 10,
-              textAlign: "right",
-            }}
-          >
-            {/* Можно не все дни подписывать, а например только Mon, Wed, Fri */}
-            {/* if (idx===0 || idx===2 || idx===4) {label} */}
-            {/*{label}*/}
-            {idx % 2 === 0 && label}
-          </div>
-        ))}
-      </div>
-
-      {/* Сетка недель */}
-      <div style={{ display: "flex", fontFamily: "sans-serif" }}>
-        {weeks.map((col, colIndex) => {
-          // месяц для подписи
-          const firstDayInCol = col[0];
-          const prevColLastDay = weeks[colIndex - 1]?.[0];
-          const monthLabel = getMonthLabel(firstDayInCol, prevColLastDay);
-
-          return (
+      <div
+        style={{
+          display: "flex",
+          color: "white",
+          width: "400px",
+        }}
+      >
+        {/* Колонка с подписями дней (7 штук) */}
+        <div style={{ marginRight: 8, marginTop: 18 }}>
+          {dayLabels.map((label, idx) => (
             <div
-              key={colIndex}
+              key={label}
               style={{
-                display: "flex",
-                flexDirection: "column",
-                marginRight: 4,
+                height: 14, // совпадает с квадратиком + margin (14+2?)
+                marginBottom: 2,
+                fontSize: 10,
+                textAlign: "right",
+                fontFamily: "sans-serif",
               }}
             >
-              {/* Отображаем название месяца (если оно есть) */}
-              <div style={{ height: 10, marginBottom: 8 }}>
-                {monthLabel && (
-                  <span style={{ fontSize: 10 }}>{monthLabel}</span>
-                )}
-              </div>
-
-              {col.map((dayInfo, rowIndex) => {
-                // tooltip: если dayInfo.records.length>0, перечислить их
-                let tooltip = "";
-                if (
-                  !dayInfo.isoKey.startsWith("blank") &&
-                  dayInfo.records.length > 0
-                ) {
-                  const lines = dayInfo.records.map((r, i) => {
-                    const shortComment = r.comment
-                      ? ` - ${r.comment.slice(0, 30)}...`
-                      : "";
-                    return `${i + 1}) ${r.technique} ${r.pattern}${shortComment}`;
-                  });
-
-                  const summaryDuration = dayInfo.records.reduce(
-                    (acc, rec) => acc + rec.duration,
-                    0,
-                  );
-
-                  const formattedDuration = formatMs(summaryDuration);
-
-                  tooltip = `${dayInfo.isoKey}\n${lines.join("\n")}\nTotal duration: ${formattedDuration} ms`;
-                } else if (!dayInfo.isoKey.startsWith("blank")) {
-                  tooltip = `${dayInfo.isoKey}\n(no trainings)`;
-                }
-
-                return (
-                  <div
-                    key={rowIndex}
-                    title={tooltip}
-                    style={{
-                      width: 14,
-                      height: 14,
-                      marginBottom: 2,
-                      backgroundColor: dayInfo.isoKey.startsWith("blank")
-                        ? "transparent"
-                        : getColor(dayInfo.count),
-                      borderRadius: 2,
-                    }}
-                  />
-                );
-              })}
+              {/* Можно не все дни подписывать, а например только Mon, Wed, Fri */}
+              {/* if (idx===0 || idx===2 || idx===4) {label} */}
+              {/*{label}*/}
+              {idx % 2 === 0 && label}
             </div>
-          );
-        })}
+          ))}
+        </div>
+
+        {/* Сетка недель */}
+        <div style={{ display: "flex", fontFamily: "sans-serif" }}>
+          {weeks.map((col, colIndex) => {
+            // месяц для подписи
+            const firstDayInCol = col[0];
+            const prevColLastDay = weeks[colIndex - 1]?.[0];
+            const monthLabel = getMonthLabel(firstDayInCol, prevColLastDay);
+
+            return (
+              <div
+                key={colIndex}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  marginRight: 4,
+                }}
+              >
+                {/* Отображаем название месяца (если оно есть) */}
+                <div style={{ height: 10, marginBottom: 8 }}>
+                  {monthLabel && (
+                    <span style={{ fontSize: 10 }}>{monthLabel}</span>
+                  )}
+                </div>
+
+                {col.map((dayInfo, rowIndex) => {
+                  // tooltip: если dayInfo.records.length>0, перечислить их
+                  let tooltip = "";
+                  if (
+                    !dayInfo.isoKey.startsWith("blank") &&
+                    dayInfo.records.length > 0
+                  ) {
+                    const lines = dayInfo.records.map((r, i) => {
+                      const shortComment = r.comment
+                        ? ` - ${r.comment.slice(0, 30)}...`
+                        : "";
+                      return `${i + 1}) ${r.technique} ${r.pattern}${shortComment}`;
+                    });
+
+                    const summaryDuration = dayInfo.records.reduce(
+                      (acc, rec) => acc + rec.duration,
+                      0,
+                    );
+
+                    const formattedDuration = formatMs(summaryDuration);
+
+                    tooltip = `${dayInfo.isoKey}\n${lines.join("\n")}\nTotal duration: ${formattedDuration} ms`;
+                  } else if (!dayInfo.isoKey.startsWith("blank")) {
+                    tooltip = `${dayInfo.isoKey}\n(no trainings)`;
+                  }
+
+                  return (
+                    <div
+                      key={rowIndex}
+                      title={tooltip}
+                      style={{
+                        width: 14,
+                        height: 14,
+                        marginBottom: 2,
+                        backgroundColor: dayInfo.isoKey.startsWith("blank")
+                          ? "transparent"
+                          : getColor(dayInfo.count),
+                        borderRadius: 2,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </Box>
   );
 };
 

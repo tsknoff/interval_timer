@@ -71,7 +71,6 @@ export const App: React.FC = () => {
   const [roundIndex, setRoundIndex] = useState(0);
   const [roundsTotal, setRoundsTotal] = useState(0);
   const [timerIndex, setTimerIndex] = useState(0);
-  const [timersTotal, setTimersTotal] = useState(0);
   const [timerName, setTimerName] = useState("");
   const [timerRemaining, setTimerRemaining] = useState(0);
 
@@ -159,7 +158,6 @@ export const App: React.FC = () => {
       setTimerName(tName);
       setTimerRemaining(tRemaining);
       setTimerIndex(tIndex);
-      setTimersTotal(tTotal);
     });
 
     roundListRef.current = newModel;
@@ -208,7 +206,6 @@ export const App: React.FC = () => {
         display: "flex",
         width: "100%",
         height: "100vh",
-        justifyContent: "center",
         alignItems: "flex-start",
         background:
           "linear-gradient(to right top, #001a6e, #002579, #013184, #033c8f, #074799)",
@@ -217,10 +214,13 @@ export const App: React.FC = () => {
     >
       <Box
         sx={{
-          padding: "1rem",
+          padding: "4rem",
           marginBottom: "2rem",
           display: "flex",
           flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "flex-end",
+          width: "100%",
           gap: 10,
           flexWrap: "wrap-reverse",
         }}
@@ -238,8 +238,6 @@ export const App: React.FC = () => {
             height: "calc(100vh - 10rem)",
             overflowY: "scroll",
             gap: 10,
-            padding: 10,
-            paddingTop: 0,
           }}
         >
           <Box
@@ -247,6 +245,8 @@ export const App: React.FC = () => {
               alignContent: "center",
               display: "flex",
               alignItems: "center",
+              justifyContent: "center",
+              height: 48,
               backgroundColor: "#023385",
               width: "100%",
               position: "sticky",
@@ -256,15 +256,24 @@ export const App: React.FC = () => {
             }}
           >
             <EventNoteIcon />
-            <h2>Training Journal</h2>
+            <h2>Practice journal</h2>
           </Box>
 
-          {journal.length === 0 && <p>No records yet.</p>}
-          {journal
-            .sort((a, b) => b.date.localeCompare(a.date))
-            .map((rec, i) => (
-              <JournalNote key={i} journalRecord={rec} />
-            ))}
+          <Box
+            style={{
+              padding: "8px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            {journal.length === 0 && <p>No records yet.</p>}
+            {journal
+              .sort((a, b) => b.date.localeCompare(a.date))
+              .map((rec, i) => (
+                <JournalNote key={i} journalRecord={rec} />
+              ))}
+          </Box>
         </Box>
         <Box
           sx={{
@@ -272,18 +281,18 @@ export const App: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 3,
+            gap: 8,
           }}
         >
           <Box
             sx={{
               width: "100%",
               display: "flex",
-              alignItems: "center",
+              alignItems: "flex-start",
               justifyContent: "center",
               flexDirection: "row",
               flexWrap: "wrap",
-              gap: 20,
+              gap: 16,
             }}
           >
             <Box
@@ -454,7 +463,8 @@ export const App: React.FC = () => {
                   sx={{ backgroundColor: "white" }}
                   onClick={handleReset}
                 >
-                  Reset
+                  {/* Прервать тренировку на английском будет "Cancel" */}
+                  Cancel
                 </Button>
               </Box>
             </Box>
@@ -476,7 +486,12 @@ export const App: React.FC = () => {
         onClose={() => setShowReviewDialog(false)}
       >
         <DialogTitle>Training Review</DialogTitle>
-        <DialogContent>
+        <DialogContent
+          style={{
+            width: 500,
+            height: 300,
+          }}
+        >
           <Typography>How was your performance?</Typography>
           <Slider
             value={trainingRating}
