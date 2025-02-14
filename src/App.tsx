@@ -1,6 +1,6 @@
 // App.tsx
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -11,6 +11,10 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -22,26 +26,30 @@ import { RoundListModel } from "./dataFlow/RoundListModel";
 // UI-компоненты
 import { MultiRoundProgressBar } from "./ui/MultiRoundProgressBar";
 import { Settings } from "./ui/Settings";
+import { JournalNote } from "./ui/JournalNote";
 
 // Хук метронома
 import { useMetronome } from "./hooks/useMetronome";
 
 // Звуки
 import { playAllRoundsEndSound } from "./utils/audioUtils";
-import { JournalNote } from "./ui/JournalNote.tsx";
 
+// Описание записи в журнале
 export interface JournalRecord {
   date: string;
-  technique: string;
-  pattern: string;
-  description?: string;
-  bpm: number;
-  rating: number;
-  comment?: string;
+
+  // Реквизиты, которые пользователь вводит перед тренировкой
+  technique: string; // из списка (Legato, Alternate picking, Downstroke...)
+  pattern: string; // короткая строка (обязательная)
+  description?: string; // описание упражнения (опционально)
+
+  bpm: number; // темп, с которым тренировались
+  rating: number; // субъективная оценка (0..100)
+  comment?: string; // комментарий по окончании
 }
 
 export const App: React.FC = () => {
-  // ----- Состояния, связанные с текущим прогрессом -----
+  // ----- Состояния, связанные с текущим прогрессом (RoundListModel) -----
   const [roundIndex, setRoundIndex] = useState(0);
   const [roundsTotal, setRoundsTotal] = useState(0);
   const [timerIndex, setTimerIndex] = useState(0);
@@ -70,56 +78,75 @@ export const App: React.FC = () => {
     ],
   ]);
 
-  // ----- Поле предмета тренировки (subject) -----
-  const [practiceSubject, setPracticeSubject] = useState("");
+  // ----- Поля тренировки: technique, pattern, description -----
+  const [technique, setTechnique] = useState("Legato"); // по умолчанию "Legato"
+  const [pattern, setPattern] = useState("");
+  const [description, setDescription] = useState("");
 
-  // ----- Оценка после окончания -----
+  // ----- Завершение тренировки (оценка, комментарий) -----
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [trainingRating, setTrainingRating] = useState(50); // 0..100
   const [trainingComment, setTrainingComment] = useState("");
 
   // ----- "Журнал" тренировок -----
-  const [journal, setJournal] = useState<JournalRecord[]>([
-    {
-      date: "2021-10-01",
-      subject: "Guitar",
-      bpm: 120,
-      rating: 80,
-      comment: "Good practice today!",
-    },
-    {
-      date: "2021-10-02",
-      subject: "Piano",
-      bpm: 100,
-      rating: 60,
-      comment: "Need to practice more.",
-    },
-    {
-      date: "2021-10-03",
-      subject: "Drums",
-      bpm: 140,
-      rating: 90,
-      comment: "Great job!",
-    },
-  ]);
+  const [journal, setJournal] = useState<JournalRecord[]>([]);
 
   // RoundListModel будет пересоздаваться при нажатии Start
   const roundListRef = useRef<RoundListModel | null>(null);
 
-  // ----- МЕТРОНОМ -----
+  // ----- МЕТРОНОМ: запускаем/останавливаем -----
   useMetronome(bpm, isPlayingMetronome);
 
-  // ----- Хендлеры -----
+  // ---------------------- Local Storage -----------------------
+  // 1) При МОНТИРОВАНИИ читаем из LocalStorage (если есть)
+  useEffect(() => {
+    const storedRounds = localStorage.getItem("rounds");
+    if (storedRounds) {
+      try {
+        const parsed = JSON.parse(storedRounds);
+        // Убедимся, что это массив массивов, или обрабатываем как нужно
+        if (Array.isArray(parsed)) {
+          setRounds(parsed);
+        }
+      } catch (e) {
+        console.warn("Error parsing rounds from localStorage", e);
+      }
+    }
+
+    const storedJournal = localStorage.getItem("journal");
+    if (storedJournal) {
+      try {
+        const parsed = JSON.parse(storedJournal);
+        if (Array.isArray(parsed)) {
+          setJournal(parsed);
+        }
+      } catch (e) {
+        console.warn("Error parsing journal from localStorage", e);
+      }
+    }
+  }, []);
+
+  // 2) При КАЖДОМ изменении rounds — сохраняем в localStorage
+  useEffect(() => {
+    localStorage.setItem("rounds", JSON.stringify(rounds));
+  }, [rounds]);
+
+  // 3) При КАЖДОМ изменении journal — сохраняем в localStorage
+  useEffect(() => {
+    localStorage.setItem("journal", JSON.stringify(journal));
+  }, [journal]);
+
+  // ---------------------- ЛОГИКА -------------------------
 
   // Создаём/запускаем новую модель, чтобы учесть изменения "rounds"
   const handleStart = () => {
-    // Проверяем, заполнил ли пользователь поле subject
-    if (!practiceSubject.trim()) {
-      alert("Пожалуйста, укажите предмет/название тренировки (Subject)!");
+    // Проверяем обязательные поля: pattern не должен быть пустым
+    if (!pattern.trim()) {
+      alert("Пожалуйста, заполните поле Pattern (название упражнения)!");
       return;
     }
 
-    // Если вдруг у нас осталась старая модель, сбросим её
+    // Если была старая модель, сбросим
     if (roundListRef.current) {
       roundListRef.current.reset();
     }
@@ -166,30 +193,30 @@ export const App: React.FC = () => {
     setTimerName("");
   };
 
-  // Для отображения в секундах (округляем)
-  const secondsLeft = Math.floor(timerRemaining / 1000);
-
-  // ----- Когда пользователь завершил оценку -----
+  // Когда пользователь завершил оценку (OK)
   const handleSubmitReview = () => {
-    // Создадим запись в журнале
     const record: JournalRecord = {
-      date: new Date().toLocaleString(), // или .toISOString()
-      subject: practiceSubject,
+      date: new Date().toLocaleString(), // В реальном случае .toISOString() или иное
+      technique,
+      pattern,
+      description: description || undefined,
       bpm,
       rating: trainingRating,
       comment: trainingComment || undefined,
     };
 
+    // Добавляем в журнал (и это автоматически сохранится в localStorage через useEffect)
     setJournal((prev) => [...prev, record]);
-    // Скрыть диалог
-    setShowReviewDialog(false);
 
-    // Сброс значений оценки
+    // Скрываем диалог и сбрасываем оценку
+    setShowReviewDialog(false);
     setTrainingRating(50);
     setTrainingComment("");
   };
 
-  // ----- Рендер -----
+  // Для отображения оставшегося времени в секундах
+  const secondsLeft = Math.floor(timerRemaining / 1000);
+
   return (
     <Box
       sx={{
@@ -207,6 +234,7 @@ export const App: React.FC = () => {
       }}
     >
       <Box sx={{ width: "60vw", padding: "1rem", marginBottom: "2rem" }}>
+        {/* Основной блок с таймером / настройками */}
         <Box sx={{ marginBottom: "1rem" }}>
           <Box
             sx={{
@@ -217,7 +245,7 @@ export const App: React.FC = () => {
               gap: 2,
             }}
           >
-            {/* Круглый блок с текущим таймером */}
+            {/* "Шар" со временем и именем таймера */}
             <Box
               sx={{
                 borderRadius: "50%",
@@ -242,28 +270,62 @@ export const App: React.FC = () => {
               <strong>Round {roundIndex + 1}</strong> / {roundsTotal}
             </Typography>
 
-            {/* Ввод "Practice subject" */}
+            {/* Блок: Technique (Select), Pattern (TextField), Description (TextField опциональный) */}
             <Box
               sx={{
                 mb: 2,
                 display: "flex",
-                flexDirection: "row",
+                flexDirection: "column",
                 gap: 2,
-                alignItems: "center",
+                alignItems: "stretch",
+                width: "100%",
+                maxWidth: 400,
               }}
             >
-              <Typography sx={{ color: "white", fontFamily: "sans-serif" }}>
-                Subject:
-              </Typography>
+              {/* Technique - select */}
+              <FormControl fullWidth>
+                <InputLabel sx={{ backgroundColor: "#fff" }}>
+                  Technique
+                </InputLabel>
+                <Select
+                  value={technique}
+                  label="Technique"
+                  onChange={(e) => setTechnique(e.target.value as string)}
+                  sx={{
+                    backgroundColor: "white",
+                  }}
+                >
+                  <MenuItem value="Legato">Legato</MenuItem>
+                  <MenuItem value="Alternate picking">
+                    Alternate picking
+                  </MenuItem>
+                  <MenuItem value="Downstroke">Downstroke</MenuItem>
+                  <MenuItem value="Sweep picking">Sweep picking</MenuItem>
+                  {/* Можно добавить свои варианты */}
+                </Select>
+              </FormControl>
+
+              {/* Pattern (обязательное поле) */}
               <TextField
+                label="Pattern"
                 variant="outlined"
                 size="small"
-                value={practiceSubject}
-                onChange={(e) => setPracticeSubject(e.target.value)}
+                value={pattern}
+                onChange={(e) => setPattern(e.target.value)}
                 sx={{
                   backgroundColor: "white",
-                  borderRadius: 1,
-                  width: 200,
+                }}
+              />
+
+              {/* Description (опциональное) */}
+              <TextField
+                label="Description (optional)"
+                variant="outlined"
+                size="small"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                sx={{
+                  backgroundColor: "white",
                 }}
               />
             </Box>
@@ -328,14 +390,17 @@ export const App: React.FC = () => {
           />
         </Box>
 
-        {/* Компонент редактирования rounds */}
+        {/* Компонент редактирования rounds (внизу) */}
         <Settings rounds={rounds} setRounds={setRounds} />
 
-        {/* Отобразим журнал (опционально) */}
-        <Box sx={{ color: "white" }}>
-          <h2 style={{ color: "white", fontFamily: "sans-serif" }}>
-            Training journal
-          </h2>
+        {/* Отобразим журнал */}
+        <Box sx={{ color: "white", mt: 3 }}>
+          <Typography
+            variant="h6"
+            sx={{ color: "white", fontFamily: "sans-serif" }}
+          >
+            Training Journal
+          </Typography>
           {journal.length === 0 && <p>No records yet.</p>}
           {journal.map((rec, i) => (
             <JournalNote key={i} journalRecord={rec} />
