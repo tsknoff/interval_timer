@@ -1,10 +1,20 @@
 // Settings.tsx
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import React from "react";
 import { TimerItem } from "../dataFlow/TimerListModel.ts";
-import { Box, Button, Icon, IconButton } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  IconButton,
+  Typography,
+} from "@mui/material";
 
 interface IProps {
   rounds: TimerItem[][];
@@ -73,88 +83,115 @@ export const Settings: React.FC<IProps> = ({ rounds, setRounds }) => {
   };
 
   return (
-    <Box style={{ color: "white", fontFamily: "sans-serif" }}>
-      <h2>Round's settings</h2>
-
-      {rounds.map((round, roundIndex) => (
-        <div
-          key={roundIndex}
+    <Accordion
+      style={{
+        fontFamily: "sans-serif",
+        backgroundColor: "transparent",
+        color: "white",
+      }}
+    >
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="panel1-content"
+        id="panel1-header"
+      >
+        <Box
           style={{
-            border: "1px solid #ccc",
-            borderRadius: 2,
-            paddingLeft: 16,
-            paddingRight: 16,
-            marginBottom: 8,
+            display: "flex",
+            flexDirection: "row",
+            gap: 8,
+            alignItems: "center",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <h3 style={{ marginRight: "auto" }}>Round #{roundIndex + 1}</h3>
-            <IconButton
-              onClick={() => handleRemoveRound(roundIndex)}
-              style={{ marginLeft: "8px" }}
-            >
-              <RemoveCircleIcon color="error" />
-            </IconButton>
-          </div>
-
-          {round.length === 0 && (
-            <p style={{ fontStyle: "italic" }}>No timers yet</p>
-          )}
-
-          {round.map((timer, timerIndex) => (
+          <SettingsIcon color="white" />
+          <h2>Round's settings</h2>
+        </Box>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Box>
+          {rounds.map((round, roundIndex) => (
             <div
-              key={timerIndex}
+              key={roundIndex}
               style={{
-                display: "flex",
-                gap: 8,
-                alignItems: "center",
+                border: "1px solid #ccc",
+                borderRadius: 2,
+                paddingLeft: 16,
+                paddingRight: 16,
+                marginBottom: 8,
               }}
             >
-              <label>
-                <input
-                  type="text"
-                  value={timer.name}
-                  onChange={(e) =>
-                    handleTimerChange(
-                      roundIndex,
-                      timerIndex,
-                      "name",
-                      e.target.value,
-                    )
-                  }
-                />
-              </label>
-              <label>
-                Duration (ms):{" "}
-                <input
-                  type="number"
-                  value={timer.duration}
-                  onChange={(e) =>
-                    handleTimerChange(
-                      roundIndex,
-                      timerIndex,
-                      "duration",
-                      e.target.value,
-                    )
-                  }
-                  style={{ width: 80 }}
-                />
-              </label>
-              <IconButton
-                aria-label="delete"
-                onClick={() => handleRemoveTimer(roundIndex, timerIndex)}
-                style={{ marginLeft: "auto" }}
-              >
-                <HighlightOffIcon color="error" />
-              </IconButton>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <h3 style={{ marginRight: "auto" }}>Round #{roundIndex + 1}</h3>
+                <IconButton
+                  onClick={() => handleRemoveRound(roundIndex)}
+                  style={{ marginLeft: "8px" }}
+                >
+                  <RemoveCircleIcon color="error" />
+                </IconButton>
+              </div>
+
+              {round.length === 0 && (
+                <p style={{ fontStyle: "italic" }}>No timers yet</p>
+              )}
+
+              {round.map((timer, timerIndex) => (
+                <div
+                  key={timerIndex}
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    alignItems: "center",
+                  }}
+                >
+                  <label>
+                    <input
+                      type="text"
+                      value={timer.name}
+                      onChange={(e) =>
+                        handleTimerChange(
+                          roundIndex,
+                          timerIndex,
+                          "name",
+                          e.target.value,
+                        )
+                      }
+                    />
+                  </label>
+                  <label>
+                    Duration (ms):{" "}
+                    <input
+                      type="number"
+                      value={timer.duration}
+                      onChange={(e) =>
+                        handleTimerChange(
+                          roundIndex,
+                          timerIndex,
+                          "duration",
+                          e.target.value,
+                        )
+                      }
+                      style={{ width: 80 }}
+                    />
+                  </label>
+                  <IconButton
+                    aria-label="delete"
+                    onClick={() => handleRemoveTimer(roundIndex, timerIndex)}
+                    style={{ marginLeft: "auto" }}
+                  >
+                    <HighlightOffIcon color="error" />
+                  </IconButton>
+                </div>
+              ))}
+
+              <Button onClick={() => handleAddTimer(roundIndex)}>
+                + Timer
+              </Button>
             </div>
           ))}
 
-          <Button onClick={() => handleAddTimer(roundIndex)}>+ Timer</Button>
-        </div>
-      ))}
-
-      <Button onClick={handleAddRound}>+ Round</Button>
-    </Box>
+          <Button onClick={handleAddRound}>+ Round</Button>
+        </Box>
+      </AccordionDetails>
+    </Accordion>
   );
 };

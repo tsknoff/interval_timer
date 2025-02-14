@@ -26,6 +26,7 @@ import { Settings } from "./ui/Settings";
 import { JournalNote } from "./ui/JournalNote";
 import { useMetronome } from "./hooks/useMetronome";
 import { playAllRoundsEndSound } from "./utils/audioUtils";
+import { ActivityGrid } from "./ui/ActivityGrid.tsx";
 
 export interface JournalRecord {
   date: string;
@@ -35,6 +36,17 @@ export interface JournalRecord {
   bpm: number;
   rating: number;
   comment?: string;
+  rounds: TimerItem[][];
+  /** Новое поле — суммарная продолжительность (мс) */
+  duration: number;
+}
+
+/** Хелпер-функция для подсчёта общей длительности. */
+function calcTotalDuration(rounds: TimerItem[][]) {
+  return rounds.reduce(
+    (acc, round) => acc + round.reduce((s, item) => s + item.duration, 0),
+    0,
+  );
 }
 
 function getFeedbackMessage(rating: number): string {
@@ -128,11 +140,6 @@ export const App: React.FC = () => {
 
   // Start training
   const handleStart = () => {
-    if (!pattern.trim()) {
-      alert("Пожалуйста, заполните поле Pattern!");
-      return;
-    }
-
     if (roundListRef.current) {
       roundListRef.current.reset();
     }
@@ -176,6 +183,8 @@ export const App: React.FC = () => {
       technique,
       pattern,
       description: description || undefined,
+      rounds: rounds,
+      duration: calcTotalDuration(rounds),
       bpm,
       rating: trainingRating,
       comment: trainingComment || undefined,
@@ -228,6 +237,9 @@ export const App: React.FC = () => {
                 flexDirection: "column",
               }}
             >
+              <Typography sx={{ color: "white" }}>
+                <strong>Round {roundIndex + 1}</strong> / {roundsTotal}
+              </Typography>
               <Typography sx={{ color: "white", fontSize: 20 }}>
                 <strong>{timerName}</strong>
               </Typography>
@@ -235,10 +247,6 @@ export const App: React.FC = () => {
                 <strong>{secondsLeft} sec</strong>
               </Typography>
             </Box>
-
-            <Typography sx={{ color: "white" }}>
-              <strong>Round {roundIndex + 1}</strong> / {roundsTotal}
-            </Typography>
 
             {/* Technique / Pattern / Description */}
             <Box
@@ -252,37 +260,50 @@ export const App: React.FC = () => {
                 maxWidth: 400,
               }}
             >
-              <FormControl fullWidth>
-                <InputLabel sx={{ backgroundColor: "#fff" }}>
-                  Technique
-                </InputLabel>
-                <Select
-                  value={technique}
-                  label="Technique"
-                  onChange={(e) => setTechnique(e.target.value as string)}
+              <Box
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                }}
+              >
+                <FormControl fullWidth>
+                  <InputLabel sx={{ backgroundColor: "#fff" }}>
+                    Technique
+                  </InputLabel>
+                  <Select
+                    value={technique}
+                    label="Technique"
+                    onChange={(e) => setTechnique(e.target.value as string)}
+                    sx={{
+                      backgroundColor: "white",
+                    }}
+                    variant={"outlined"}
+                    size={"small"}
+                  >
+                    <MenuItem value="Warmup">Warmup</MenuItem>
+                    <MenuItem value="Steps">Steps</MenuItem>
+                    <MenuItem value="Steps">Chords</MenuItem>
+                    <MenuItem value="Steps">Legato-arpeggio</MenuItem>
+                    <MenuItem value="Legato">Legato</MenuItem>
+                    <MenuItem value="Alternate picking">
+                      Alternate picking
+                    </MenuItem>
+                    <MenuItem value="Downstroke">Downstroke</MenuItem>
+                    <MenuItem value="Sweep picking">Sweep picking</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  label="Pattern"
+                  variant="outlined"
+                  size="small"
+                  value={pattern}
+                  onChange={(e) => setPattern(e.target.value)}
                   sx={{
                     backgroundColor: "white",
                   }}
-                >
-                  <MenuItem value="Legato">Legato</MenuItem>
-                  <MenuItem value="Alternate picking">
-                    Alternate picking
-                  </MenuItem>
-                  <MenuItem value="Downstroke">Downstroke</MenuItem>
-                  <MenuItem value="Sweep picking">Sweep picking</MenuItem>
-                </Select>
-              </FormControl>
-
-              <TextField
-                label="Pattern"
-                variant="outlined"
-                size="small"
-                value={pattern}
-                onChange={(e) => setPattern(e.target.value)}
-                sx={{
-                  backgroundColor: "white",
-                }}
-              />
+                />
+              </Box>
 
               <TextField
                 label="Description (optional)"
@@ -294,6 +315,8 @@ export const App: React.FC = () => {
                   backgroundColor: "white",
                 }}
               />
+              {/* Settings для редактирования rounds */}
+              <Settings rounds={rounds} setRounds={setRounds} />
             </Box>
 
             {/* BPM */}
@@ -306,6 +329,11 @@ export const App: React.FC = () => {
                 justifyContent: "center",
               }}
             >
+              <img
+                src={"assets/metronome.svg"}
+                alt={"metronome"}
+                style={{ width: 20, height: 20, marginRight: 5 }}
+              />
               <Typography sx={{ color: "white" }}>
                 <strong>BPM: {bpm}</strong>
               </Typography>
@@ -355,8 +383,7 @@ export const App: React.FC = () => {
           />
         </Box>
 
-        {/* Settings для редактирования rounds */}
-        <Settings rounds={rounds} setRounds={setRounds} />
+        <ActivityGrid journalRecords={journal} />
 
         {/* Journal */}
         <Box sx={{ color: "white", mt: 3 }}>
