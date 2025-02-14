@@ -19,37 +19,42 @@ import {
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
-// Модели / типы
 import { TimerItem } from "./dataFlow/TimerListModel";
 import { RoundListModel } from "./dataFlow/RoundListModel";
-
-// UI-компоненты
 import { MultiRoundProgressBar } from "./ui/MultiRoundProgressBar";
 import { Settings } from "./ui/Settings";
 import { JournalNote } from "./ui/JournalNote";
-
-// Хук метронома
 import { useMetronome } from "./hooks/useMetronome";
-
-// Звуки
 import { playAllRoundsEndSound } from "./utils/audioUtils";
 
-// Описание записи в журнале
 export interface JournalRecord {
   date: string;
+  technique: string;
+  pattern: string;
+  description?: string;
+  bpm: number;
+  rating: number;
+  comment?: string;
+}
 
-  // Реквизиты, которые пользователь вводит перед тренировкой
-  technique: string; // из списка (Legato, Alternate picking, Downstroke...)
-  pattern: string; // короткая строка (обязательная)
-  description?: string; // описание упражнения (опционально)
-
-  bpm: number; // темп, с которым тренировались
-  rating: number; // субъективная оценка (0..100)
-  comment?: string; // комментарий по окончании
+function getFeedbackMessage(rating: number): string {
+  if (rating <= 10) {
+    return "I barely remembered the exercise; it was mostly just noise from the instrument.";
+  } else if (rating <= 30) {
+    return "Sometimes things clicked, but overall I fell out of tempo and the sound was quite rough.";
+  } else if (rating <= 50) {
+    return "Occasionally I stayed with the metronome, occasionally I didn't. I need more work on precision.";
+  } else if (rating <= 70) {
+    return "Overall not bad: I roughly kept the rhythm, but there were some flaws.";
+  } else if (rating <= 90) {
+    return "The tempo was quite good, the sound was almost always clean, with only a few slips.";
+  } else {
+    return "I kept perfect time with the metronome, each note lasted exactly as intended, and there were no extra noises.";
+  }
 }
 
 export const App: React.FC = () => {
-  // ----- Состояния, связанные с текущим прогрессом (RoundListModel) -----
+  // ----- RoundListModel states -----
   const [roundIndex, setRoundIndex] = useState(0);
   const [roundsTotal, setRoundsTotal] = useState(0);
   const [timerIndex, setTimerIndex] = useState(0);
@@ -57,57 +62,45 @@ export const App: React.FC = () => {
   const [timerName, setTimerName] = useState("");
   const [timerRemaining, setTimerRemaining] = useState(0);
 
-  // ----- Метроном -----
+  // ----- Metronome -----
   const [bpm, setBpm] = useState(100);
   const [isPlayingMetronome, setIsPlayingMetronome] = useState(false);
 
-  // ----- РАУНДЫ (редактируемые) -----
+  // ----- Rounds -----
   const [rounds, setRounds] = useState<TimerItem[][]>([
     [{ name: "Ready?", duration: 4000 }],
     [
       { name: "Practice", duration: 60000 },
       { name: "Relax", duration: 15000 },
     ],
-    [
-      { name: "Practice", duration: 120000 },
-      { name: "Relax", duration: 15000 },
-    ],
-    [
-      { name: "Practice", duration: 120000 },
-      { name: "Relax", duration: 15000 },
-    ],
   ]);
 
-  // ----- Поля тренировки: technique, pattern, description -----
-  const [technique, setTechnique] = useState("Legato"); // по умолчанию "Legato"
+  // ----- Technique fields -----
+  const [technique, setTechnique] = useState("Legato");
   const [pattern, setPattern] = useState("");
   const [description, setDescription] = useState("");
 
-  // ----- Завершение тренировки (оценка, комментарий) -----
+  // ----- Feedback after training -----
   const [showReviewDialog, setShowReviewDialog] = useState(false);
-  const [trainingRating, setTrainingRating] = useState(50); // 0..100
+  const [trainingRating, setTrainingRating] = useState(50);
   const [trainingComment, setTrainingComment] = useState("");
 
-  // ----- "Журнал" тренировок -----
+  // ----- Journal -----
   const [journal, setJournal] = useState<JournalRecord[]>([]);
 
-  // RoundListModel будет пересоздаваться при нажатии Start
+  // RoundListModel ref
   const roundListRef = useRef<RoundListModel | null>(null);
 
-  // ----- МЕТРОНОМ: запускаем/останавливаем -----
+  // useMetronome
   useMetronome(bpm, isPlayingMetronome);
 
-  // ---------------------- Local Storage -----------------------
-  // 1) При МОНТИРОВАНИИ читаем из LocalStorage (если есть)
+  // 1) Load from localStorage on mount
   useEffect(() => {
     const storedRounds = localStorage.getItem("rounds");
     if (storedRounds) {
       try {
         const parsed = JSON.parse(storedRounds);
-        // Убедимся, что это массив массивов, или обрабатываем как нужно
-        if (Array.isArray(parsed)) {
-          setRounds(parsed);
-        }
+        if (Array.isArray(parsed)) setRounds(parsed);
       } catch (e) {
         console.warn("Error parsing rounds from localStorage", e);
       }
@@ -117,54 +110,41 @@ export const App: React.FC = () => {
     if (storedJournal) {
       try {
         const parsed = JSON.parse(storedJournal);
-        if (Array.isArray(parsed)) {
-          setJournal(parsed);
-        }
+        if (Array.isArray(parsed)) setJournal(parsed);
       } catch (e) {
         console.warn("Error parsing journal from localStorage", e);
       }
     }
   }, []);
 
-  // 2) При КАЖДОМ изменении rounds — сохраняем в localStorage
+  // 2) Save to localStorage when rounds or journal change
   useEffect(() => {
     localStorage.setItem("rounds", JSON.stringify(rounds));
   }, [rounds]);
 
-  // 3) При КАЖДОМ изменении journal — сохраняем в localStorage
   useEffect(() => {
     localStorage.setItem("journal", JSON.stringify(journal));
   }, [journal]);
 
-  // ---------------------- ЛОГИКА -------------------------
-
-  // Создаём/запускаем новую модель, чтобы учесть изменения "rounds"
+  // Start training
   const handleStart = () => {
-    // Проверяем обязательные поля: pattern не должен быть пустым
     if (!pattern.trim()) {
-      alert("Пожалуйста, заполните поле Pattern (название упражнения)!");
+      alert("Пожалуйста, заполните поле Pattern!");
       return;
     }
 
-    // Если была старая модель, сбросим
     if (roundListRef.current) {
       roundListRef.current.reset();
     }
 
-    // Коллбэк при полном завершении ВСЕХ раундов
     const handleAllRoundsFinished = () => {
       alert("Все раунды завершены!");
       playAllRoundsEndSound();
-      setIsPlayingMetronome(false); // выключаем метроном
-
-      // Показываем диалог оценки
+      setIsPlayingMetronome(false);
       setShowReviewDialog(true);
     };
 
-    // Создаём новую модель
     const newModel = new RoundListModel(rounds, handleAllRoundsFinished);
-
-    // Подписываемся на обновления, чтобы получать прогресс
     newModel.subscribe((rIndex, rTotal, tName, tRemaining, tIndex, tTotal) => {
       setRoundIndex(rIndex);
       setRoundsTotal(rTotal);
@@ -174,29 +154,25 @@ export const App: React.FC = () => {
       setTimersTotal(tTotal);
     });
 
-    // Запоминаем новую модель в ref
     roundListRef.current = newModel;
-
-    // Запуск + метроном
     newModel.start();
     setIsPlayingMetronome(true);
   };
 
-  // Сброс модели и состояний
+  // Reset training
   const handleReset = () => {
     roundListRef.current?.reset();
     setIsPlayingMetronome(false);
-
     setRoundIndex(0);
     setTimerIndex(0);
     setTimerRemaining(0);
     setTimerName("");
   };
 
-  // Когда пользователь завершил оценку (OK)
+  // Submit review
   const handleSubmitReview = () => {
     const record: JournalRecord = {
-      date: new Date().toLocaleString(), // В реальном случае .toISOString() или иное
+      date: new Date().toLocaleString(),
       technique,
       pattern,
       description: description || undefined,
@@ -204,17 +180,13 @@ export const App: React.FC = () => {
       rating: trainingRating,
       comment: trainingComment || undefined,
     };
-
-    // Добавляем в журнал (и это автоматически сохранится в localStorage через useEffect)
     setJournal((prev) => [...prev, record]);
 
-    // Скрываем диалог и сбрасываем оценку
     setShowReviewDialog(false);
     setTrainingRating(50);
     setTrainingComment("");
   };
 
-  // Для отображения оставшегося времени в секундах
   const secondsLeft = Math.floor(timerRemaining / 1000);
 
   return (
@@ -234,7 +206,6 @@ export const App: React.FC = () => {
       }}
     >
       <Box sx={{ width: "60vw", padding: "1rem", marginBottom: "2rem" }}>
-        {/* Основной блок с таймером / настройками */}
         <Box sx={{ marginBottom: "1rem" }}>
           <Box
             sx={{
@@ -245,7 +216,6 @@ export const App: React.FC = () => {
               gap: 2,
             }}
           >
-            {/* "Шар" со временем и именем таймера */}
             <Box
               sx={{
                 borderRadius: "50%",
@@ -270,7 +240,7 @@ export const App: React.FC = () => {
               <strong>Round {roundIndex + 1}</strong> / {roundsTotal}
             </Typography>
 
-            {/* Блок: Technique (Select), Pattern (TextField), Description (TextField опциональный) */}
+            {/* Technique / Pattern / Description */}
             <Box
               sx={{
                 mb: 2,
@@ -282,7 +252,6 @@ export const App: React.FC = () => {
                 maxWidth: 400,
               }}
             >
-              {/* Technique - select */}
               <FormControl fullWidth>
                 <InputLabel sx={{ backgroundColor: "#fff" }}>
                   Technique
@@ -301,11 +270,9 @@ export const App: React.FC = () => {
                   </MenuItem>
                   <MenuItem value="Downstroke">Downstroke</MenuItem>
                   <MenuItem value="Sweep picking">Sweep picking</MenuItem>
-                  {/* Можно добавить свои варианты */}
                 </Select>
               </FormControl>
 
-              {/* Pattern (обязательное поле) */}
               <TextField
                 label="Pattern"
                 variant="outlined"
@@ -317,7 +284,6 @@ export const App: React.FC = () => {
                 }}
               />
 
-              {/* Description (опциональное) */}
               <TextField
                 label="Description (optional)"
                 variant="outlined"
@@ -381,7 +347,6 @@ export const App: React.FC = () => {
             </Box>
           </Box>
 
-          {/* Прогресс-бар (сегментированный) */}
           <MultiRoundProgressBar
             rounds={rounds}
             currentRoundIndex={roundIndex}
@@ -390,15 +355,12 @@ export const App: React.FC = () => {
           />
         </Box>
 
-        {/* Компонент редактирования rounds (внизу) */}
+        {/* Settings для редактирования rounds */}
         <Settings rounds={rounds} setRounds={setRounds} />
 
-        {/* Отобразим журнал */}
+        {/* Journal */}
         <Box sx={{ color: "white", mt: 3 }}>
-          <Typography
-            variant="h6"
-            sx={{ color: "white", fontFamily: "sans-serif" }}
-          >
+          <Typography variant="h6" sx={{ color: "white" }}>
             Training Journal
           </Typography>
           {journal.length === 0 && <p>No records yet.</p>}
@@ -408,7 +370,7 @@ export const App: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Диалог для оценки после окончания тренировки */}
+      {/* Диалог после завершения (Review) */}
       <Dialog
         open={showReviewDialog}
         onClose={() => setShowReviewDialog(false)}
@@ -425,6 +387,11 @@ export const App: React.FC = () => {
             sx={{ width: 200, mt: 2 }}
           />
 
+          {/* Отображаем динамическое сообщение */}
+          <Typography sx={{ mt: 2, mb: 2 }}>
+            {getFeedbackMessage(trainingRating)}
+          </Typography>
+
           <TextField
             label="Comments (optional)"
             multiline
@@ -432,7 +399,6 @@ export const App: React.FC = () => {
             fullWidth
             value={trainingComment}
             onChange={(e) => setTrainingComment(e.target.value)}
-            sx={{ mt: 2 }}
           />
         </DialogContent>
         <DialogActions>
