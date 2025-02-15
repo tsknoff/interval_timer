@@ -112,7 +112,7 @@ export const Settings: React.FC<IProps> = ({ rounds, setRounds }) => {
             alignItems: "center",
           }}
         >
-          <SettingsIcon color="white" />
+          <SettingsIcon />
           <h3>Round's settings</h3>
         </Box>
       </AccordionSummary>

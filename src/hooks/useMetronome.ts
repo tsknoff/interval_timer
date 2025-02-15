@@ -44,6 +44,8 @@ export function useMetronome(
   volume: number = 1.0,
   isMuted: boolean = false,
 ) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const beatIndexRef = useRef<number>(0); // счётчик долей
 
@@ -106,8 +108,7 @@ function playMetronomeClick(
   const gain = audioCtx.createGain();
 
   // Например, для акцента частота 1500, иначе 1000
-  const freq = isAccent ? 1500 : 1000;
-  osc.frequency.value = freq;
+  osc.frequency.value = isAccent ? 1500 : 1000;
 
   osc.connect(gain).connect(audioCtx.destination);
 

@@ -2,7 +2,7 @@
 
 import { FC } from "react";
 import { JournalRecord } from "../App.tsx";
-import { Box, Card, CardContent, Typography, useTheme } from "@mui/material";
+import { Box, Card, CardContent, Typography } from "@mui/material";
 
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
@@ -106,8 +106,6 @@ interface IProps {
 }
 
 export const JournalNote: FC<IProps> = ({ journalRecord }) => {
-  const theme = useTheme();
-
   // Преобразуем время записи в "time ago"
   const timeAgoText = formatTimeAgo(journalRecord.date);
 

@@ -92,6 +92,8 @@ export class RoundListModel implements IRoundListModel {
         this.handleRoundFinished();
       },
       onTimerFinished: (timerName, timerIndex) => {
+        console.log("Timer finished:", timerName);
+        console.log("Timer index:", timerIndex);
         // завершился ОДИН таймер — проигрываем звук конца таймера
         playTimerEndSound();
       },
