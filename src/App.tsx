@@ -15,10 +15,14 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  AccordionDetails,
+  Accordion,
+  AccordionSummary,
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import EventNoteIcon from "@mui/icons-material/EventNote";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { TimerItem } from "./dataFlow/TimerListModel";
 import { RoundListModel } from "./dataFlow/RoundListModel";
@@ -103,8 +107,7 @@ export const App: React.FC = () => {
   // RoundListModel ref
   const roundListRef = useRef<RoundListModel | null>(null);
 
-  // useMetronome
-  useMetronome(bpm, isPlayingMetronome);
+  useMetronome(bpm, isPlayingMetronome, 1, true, 0.8, false);
 
   // 1) Load from localStorage on mount
   useEffect(() => {
@@ -411,33 +414,63 @@ export const App: React.FC = () => {
               {/* Settings для редактирования rounds */}
               <Settings rounds={rounds} setRounds={setRounds} />
               {/* BPM */}
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: 1,
-                  alignItems: "center",
-                  justifyContent: "center",
+              <Accordion
+                disableGutters={true}
+                style={{
+                  fontFamily: "sans-serif",
+                  backgroundColor: "transparent",
+                  color: "white",
                 }}
               >
-                <img
-                  src={"assets/metronome.svg"}
-                  alt={"metronome"}
-                  style={{ width: 20, height: 20, marginRight: 5 }}
-                />
-                <Typography sx={{ color: "white" }}>
-                  <strong>BPM: {bpm}</strong>
-                </Typography>
-                <Slider
-                  value={bpm}
-                  onChange={(e, newValue) => setBpm(newValue as number)}
-                  min={70}
-                  max={150}
-                  step={1}
-                  sx={{ width: 200 }}
-                />
-              </Box>
-
+                <AccordionSummary
+                  expandIcon={
+                    <ExpandMoreIcon
+                      style={{
+                        color: "white",
+                      }}
+                    />
+                  }
+                  aria-controls="panel1-content"
+                  id="panel1-header"
+                  style={{
+                    height: 50,
+                  }}
+                >
+                  <Box
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      gap: 8,
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={"assets/metronome.svg"}
+                      alt={"metronome"}
+                      style={{ width: 20, height: 20, marginRight: 5 }}
+                    />
+                    <h3 style={{ color: "white", width: "100px" }}>
+                      <strong>BPM: {bpm}</strong>
+                    </h3>
+                    <Slider
+                      value={bpm}
+                      onChange={(e, newValue) => setBpm(newValue as number)}
+                      min={50}
+                      max={200}
+                      step={1}
+                      onClick={(e) => e.stopPropagation()}
+                      sx={{
+                        width: 200,
+                      }}
+                    />
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Suspendisse malesuada lacus ex, sit amet blandit leo lobortis
+                  eget.
+                </AccordionDetails>
+              </Accordion>
               {/* Кнопки Start/Reset */}
               <Box
                 sx={{

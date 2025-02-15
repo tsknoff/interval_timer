@@ -83,6 +83,7 @@ export const Settings: React.FC<IProps> = ({ rounds, setRounds }) => {
 
   return (
     <Accordion
+      disableGutters={true}
       style={{
         fontFamily: "sans-serif",
         backgroundColor: "transparent",
@@ -100,7 +101,7 @@ export const Settings: React.FC<IProps> = ({ rounds, setRounds }) => {
         aria-controls="panel1-content"
         id="panel1-header"
         style={{
-          height: 48,
+          height: 50,
         }}
       >
         <Box
@@ -112,7 +113,7 @@ export const Settings: React.FC<IProps> = ({ rounds, setRounds }) => {
           }}
         >
           <SettingsIcon color="white" />
-          <h2>Round's settings</h2>
+          <h3>Round's settings</h3>
         </Box>
       </AccordionSummary>
       <AccordionDetails>

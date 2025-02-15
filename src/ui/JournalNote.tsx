@@ -2,14 +2,9 @@
 
 import { FC } from "react";
 import { JournalRecord } from "../App.tsx";
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  LinearProgress,
-  useTheme,
-} from "@mui/material";
+import { Box, Card, CardContent, Typography, useTheme } from "@mui/material";
+
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 /** Преобразуем miliseconds -> "1m 30s" или "2h 5m" */
 function formatDuration(ms: number): string {
@@ -125,8 +120,8 @@ export const JournalNote: FC<IProps> = ({ journalRecord }) => {
     <Card
       style={{
         marginBottom: 2,
-        backgroundColor: theme.palette.background.paper,
-        color: theme.palette.text.primary,
+        backgroundColor: "rgba(255, 255, 255, 0.2)",
+        color: "white",
         width: 400,
         minHeight: "fit-content",
       }}
@@ -140,28 +135,44 @@ export const JournalNote: FC<IProps> = ({ journalRecord }) => {
             marginBottom: 1,
           }}
         >
+          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+            {journalRecord.technique}{" "}
+            <span
+              style={{
+                fontWeight: 400,
+              }}
+            >
+              {journalRecord.pattern}
+            </span>{" "}
+          </Typography>
           <Typography variant="body2" sx={{ opacity: 0.7 }}>
             {timeAgoText}
-          </Typography>
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            {journalRecord.bpm} BPM
           </Typography>
         </Box>
 
         {/* Duration */}
-        <Box sx={{ marginBottom: 1 }}>
+        <Box sx={{ marginBottom: 1, display: "flex", alignItems: "center" }}>
+          <AccessTimeIcon
+            sx={{
+              fontSize: 16,
+              verticalAlign: "middle",
+              marginRight: 0.5,
+            }}
+          />
           <Typography variant="body2" sx={{ opacity: 0.7 }}>
-            Duration: {durationText}
+            {durationText}
+          </Typography>
+          <img
+            src={"assets/metronome.svg"}
+            alt={"metronome"}
+            style={{ width: 12, height: 12, marginLeft: 15 }}
+          />
+          <Typography variant="body2" sx={{ marginLeft: 0.5 }}>
+            {journalRecord.bpm} BPM
           </Typography>
         </Box>
 
         {/* Technique / Pattern / Description */}
-        <Typography variant="body1" sx={{ fontWeight: 600 }}>
-          {journalRecord.technique}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {journalRecord.pattern}
-        </Typography>
         {journalRecord.description && (
           <Typography variant="body2" sx={{ marginTop: 1 }}>
             {journalRecord.description}
