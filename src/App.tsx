@@ -14,6 +14,7 @@ import { TimerCircle } from "./ui/TimerCircle.tsx";
 import { JournalList } from "./ui/JournalList.tsx";
 import { DialogWorkoutReview } from "./ui/DialogWorkoutReview.tsx";
 import { useLayoutStyles } from "./ui/styles.ts";
+import { ResponsiveAppBar } from "./ui/ResponsiveAppBar.tsx";
 
 export interface JournalRecord {
   date: string;
@@ -72,7 +73,7 @@ export const App: React.FC = () => {
   // RoundListModel ref
   const roundListRef = useRef<RoundListModel | null>(null);
 
-  useMetronome(bpm, isPlayingMetronome, 1, true, 2, false);
+  useMetronome(bpm, isPlayingMetronome, 1, false, 2, false);
 
   // 1) Load from localStorage on mount
   useEffect(() => {
@@ -169,8 +170,8 @@ export const App: React.FC = () => {
 
   return (
     <Box className={classes.root}>
+      <ResponsiveAppBar />
       <Box className={classes.twoColumnsWrapper}>
-        <JournalList journal={journal} />
         <Box className={classes.secondColumnWrapper}>
           <Box className={classes.circleAndDetailsWrapper}>
             <TimerCircle
@@ -203,8 +204,8 @@ export const App: React.FC = () => {
           />
           <ActivityGrid journalRecords={journal} />
         </Box>
+        <JournalList journal={journal} />
       </Box>
-
       {/* Диалог после завершения (Review) */}
       <DialogWorkoutReview
         showReviewDialog={showReviewDialog}

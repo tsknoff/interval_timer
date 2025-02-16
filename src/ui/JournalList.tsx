@@ -29,14 +29,17 @@ export const JournalList: FC<IJournalList> = ({ journal }) => {
           alignContent: "center",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
-          height: 48,
+          justifyContent: "flex-start",
           backgroundColor: "#023385",
           width: "100%",
+          fontFamily: "sans-serif",
+          color: "white",
           position: "sticky",
           top: 0,
           gap: 8,
           zIndex: 1,
+          marginBottom: 16,
+          paddingLeft: 32,
         }}
       >
         <EventNoteIcon />

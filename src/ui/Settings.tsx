@@ -12,7 +12,11 @@ import {
   AccordionSummary,
   Box,
   Button,
+  FormControl,
   IconButton,
+  InputAdornment,
+  OutlinedInput,
+  Typography,
 } from "@mui/material";
 
 interface IProps {
@@ -71,9 +75,11 @@ export const Settings: React.FC<IProps> = ({ rounds, setRounds }) => {
     if (field === "name") {
       timer.name = value;
     } else if (field === "duration") {
-      // duration — число (мс).
+      // duration — число (cекунды), поэтому преобразуем из строки
       // Преобразуем из строки. Если пусто, ставим 0 или оставляем 0.
-      timer.duration = parseInt(value, 10) || 0;
+      // timer.duration = parseInt(value, 10) || 0;
+      const seconds = parseInt(value, 10) || 0;
+      timer.duration = seconds * 1000;
     }
 
     timers[timerIndex] = timer;
@@ -123,7 +129,7 @@ export const Settings: React.FC<IProps> = ({ rounds, setRounds }) => {
               key={roundIndex}
               style={{
                 border: "1px solid #ccc",
-                borderRadius: 2,
+                borderRadius: 4,
                 paddingLeft: 16,
                 paddingRight: 16,
                 marginBottom: 8,
@@ -143,62 +149,108 @@ export const Settings: React.FC<IProps> = ({ rounds, setRounds }) => {
                 <p style={{ fontStyle: "italic" }}>No timers yet</p>
               )}
 
-              {round.map((timer, timerIndex) => (
-                <div
-                  key={timerIndex}
-                  style={{
-                    display: "flex",
-                    gap: 8,
-                    alignItems: "center",
-                  }}
-                >
-                  <label>
-                    <input
-                      type="text"
-                      value={timer.name}
-                      onChange={(e) =>
-                        handleTimerChange(
-                          roundIndex,
-                          timerIndex,
-                          "name",
-                          e.target.value,
-                        )
-                      }
-                    />
-                  </label>
-                  <label>
-                    Duration (ms):{" "}
-                    <input
-                      type="number"
-                      value={timer.duration}
-                      onChange={(e) =>
-                        handleTimerChange(
-                          roundIndex,
-                          timerIndex,
-                          "duration",
-                          e.target.value,
-                        )
-                      }
-                      style={{ width: 80 }}
-                    />
-                  </label>
-                  <IconButton
-                    aria-label="delete"
-                    onClick={() => handleRemoveTimer(roundIndex, timerIndex)}
-                    style={{ marginLeft: "auto" }}
+              <Box
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                }}
+              >
+                {round.map((timer, timerIndex) => (
+                  <Box
+                    key={timerIndex}
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      alignItems: "center",
+                    }}
                   >
-                    <HighlightOffIcon color="error" />
-                  </IconButton>
-                </div>
-              ))}
-
-              <Button onClick={() => handleAddTimer(roundIndex)}>
+                    <FormControl
+                      style={{
+                        flex: 3,
+                      }}
+                      variant="outlined"
+                    >
+                      <OutlinedInput
+                        size={"small"}
+                        value={timer.name}
+                        onChange={(e) =>
+                          handleTimerChange(
+                            roundIndex,
+                            timerIndex,
+                            "name",
+                            e.target.value,
+                          )
+                        }
+                        style={{
+                          color: "white",
+                        }}
+                      />
+                    </FormControl>
+                    <FormControl
+                      style={{
+                        flex: 2,
+                      }}
+                      variant="outlined"
+                    >
+                      <OutlinedInput
+                        size={"small"}
+                        type="number"
+                        value={timer.duration / 1000}
+                        style={{
+                          color: "white",
+                        }}
+                        onChange={(e) =>
+                          handleTimerChange(
+                            roundIndex,
+                            timerIndex,
+                            "duration",
+                            e.target.value,
+                          )
+                        }
+                        id="outlined-adornment-weight"
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <Typography style={{ color: "white" }}>
+                              sec
+                            </Typography>
+                          </InputAdornment>
+                        }
+                      />
+                    </FormControl>
+                    <IconButton
+                      aria-label="delete"
+                      onClick={() => handleRemoveTimer(roundIndex, timerIndex)}
+                      style={{ marginLeft: "auto" }}
+                    >
+                      <HighlightOffIcon color="error" />
+                    </IconButton>
+                  </Box>
+                ))}
+              </Box>
+              <Button
+                size={"small"}
+                variant={"contained"}
+                onClick={() => handleAddTimer(roundIndex)}
+                style={{
+                  color: "white",
+                  marginTop: 8,
+                  marginBottom: 8,
+                }}
+              >
                 + Timer
               </Button>
             </div>
           ))}
 
-          <Button onClick={handleAddRound}>+ Round</Button>
+          <Button
+            onClick={handleAddRound}
+            style={{
+              color: "white",
+            }}
+          >
+            + Round
+          </Button>
         </Box>
       </AccordionDetails>
     </Accordion>

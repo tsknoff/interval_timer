@@ -1,12 +1,14 @@
 // ActivityGrid.tsx
-import { FC, useMemo } from "react";
+
+import { FC, ReactNode, useEffect, useMemo } from "react";
 import { JournalRecord } from "../App.tsx";
-import { Box } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
 
 interface IActivityGridProps {
   journalRecords: JournalRecord[];
 }
 
+/** Утилита: форматируем миллисекунды (duration) в "Xm Ys" */
 function formatMs(ms: number): string {
   const totalSec = Math.floor(ms / 1000);
   const min = Math.floor(totalSec / 60);
@@ -14,25 +16,52 @@ function formatMs(ms: number): string {
   return `${min}m ${sec}s`;
 }
 
+/** Преобразуем строку "13.02.2025, 16:48:34" в объект Date. */
+function parseRecordDate(dateStr: string): Date | null {
+  try {
+    const [datePart, timePart] = dateStr.split(",");
+    if (!datePart || !timePart) return null;
+
+    const [dayStr, monthStr, yearStr] = datePart.split(".");
+    const [hhStr, mmStr, ssStr] = timePart.split(":");
+
+    const day = parseInt(dayStr, 10);
+    const month = parseInt(monthStr, 10) - 1; // JS Date: 0..11
+    const year = parseInt(yearStr, 10);
+
+    const hour = parseInt(hhStr, 10);
+    const min = parseInt(mmStr, 10);
+    const sec = parseInt(ssStr, 10);
+
+    const d = new Date(year, month, day, hour, min, sec);
+    if (isNaN(d.getTime())) return null;
+    return d;
+  } catch {
+    return null;
+  }
+}
+
+/** Тип для внутренней структуры дня */
 type DayInfo = {
   date: Date;
-  isoKey: string; // "YYYY-MM-DD"
-  count: number; // сколько тренировок
-  records: JournalRecord[]; // сами записи (чтобы вывести список в tooltip)
+  isoKey: string;
+  count: number;
+  records: JournalRecord[];
 };
 
 export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
-  // --- 1. Подготовка словаря dateKey => массив JournalRecord ---
-
-  // Для каждой записи определим "YYYY-MM-DD", чтобы сгруппировать
+  // --- 1. Сгруппировать записи по "YYYY-MM-DD" ---
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const recordsByDay = useMemo(() => {
     const map: Record<string, JournalRecord[]> = {};
     journalRecords.forEach((rec) => {
-      // Пример входящей даты: "13.02.2025, 16:48:34"
-      // Извлекаем только день, месяц, год
-      const [datePart] = rec.date.split(","); // "13.02.2025"
+      // Пример: "13.02.2025, 16:48:34"
+      const [datePart] = rec.date.split(",");
+      if (!datePart) return;
       const [dayStr, monthStr, yearStr] = datePart.split(".");
+      if (!yearStr) return;
       const isoKey = `${yearStr}-${monthStr}-${dayStr}`; // "2025-02-13"
+
       if (!map[isoKey]) {
         map[isoKey] = [];
       }
@@ -41,43 +70,26 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
     return map;
   }, [journalRecords]);
 
-  // --- 2. Генерация списка дат за нужный период (например, 1 год) ---
+  // --- 2. Генерируем даты за год ---
   const today = new Date();
   const startDate = new Date(today);
-  startDate.setFullYear(startDate.getFullYear() - 1); // год назад
+  startDate.setFullYear(startDate.getFullYear() - 1);
 
-  // Собираем все дни (Date) от startDate до today
   const allDates: Date[] = [];
-  let cur = new Date(startDate);
-  // Пройдёмся по дням, пока не превысим today
+  const cur = new Date(startDate);
   while (cur <= today) {
     allDates.push(new Date(cur));
     cur.setDate(cur.getDate() + 1);
   }
 
-  // --- 3. Сформируем структуру "недель" (GitHub-стиль) ---
-  // GitHub строит сетку, где по горизонтали — недели, по вертикали — дни недели (всего 7 строк).
-  // При этом "первая" колонка - самый старый день, "последняя" - новый. (или наоборот, но GitHub идёт слева-направо)
-  // Нужно определить, какой день недели у startDate (чтобы выровнять).
-
-  // Упрощённо: мы возьмём allDates[0] как "первую клетку" в столбце, где dayOfWeek=allDates[0].getDay().
-  // (Учтём, что getDay() в JS: 0=воскресенье, 1=понедельник, ...6=суббота. Для GitHub обычно "Mon"=0.)
-  // Для наглядности подменим немного логику, чтобы понедельник был = 0, ... воскресенье = 6.
-
-  function getDayOfWeek(d: Date): number {
-    // JS getDay(): 0=Sunday, 1=Monday,...,6=Saturday
-    // хотим: 0=Monday, 6=Sunday
-    let wd = d.getDay(); // 0..6
-    if (wd === 0) wd = 7; // Sunday
-    return wd - 1; // теперь Пн=0,...,Вс=6
+  // --- 3. Превращаем в DayInfo ---
+  function formatDate(d: Date) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
   }
 
-  // создаём массив недель (каждый элемент — это 7 ячеек (DayInfo))
-  // но сначала нам нужно "подвинуть" даты так, чтобы первая неделя началась с понедельника.
-  // Если первый день (startDate) приходится на среду, мы добавим пустые слоты (в реальном GitHub так делается).
-  // Но можно упростить, если не нужна точная "красивая" отрисовка. Покажем всё подряд.
-
-  // Создадим массив DayInfo для всех дат
   const dayInfos: DayInfo[] = allDates.map((dateObj) => {
     const isoKey = formatDate(dateObj);
     const recs = recordsByDay[isoKey] || [];
@@ -89,42 +101,33 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
     };
   });
 
-  // Теперь разобьём на недели (каждая неделя — 7 позиций (дни), индекс по dayOfWeek)
-  // Но GitHub формирует столбцы = недели (т.е. каждый столбец ~ 1 неделю),
-  // а строки = дни (0..6). Пойдём column-major order.
+  // Смещение первой недели, чтобы понедельник=0, вторник=1, ...
+  function getDayOfWeek(d: Date): number {
+    let wd = d.getDay(); // 0..6, 0=Sunday
+    if (wd === 0) wd = 7;
+    return wd - 1; // Monday=0..Sunday=6
+  }
 
-  // Определим, сколько "столбцов" получится (примерно (количество дней + offset) / 7).
-  // Чтобы правильно сдвигать первую неделю, делаем offset = getDayOfWeek(dayInfos[0].date).
-  const firstDayOffset = getDayOfWeek(dayInfos[0].date); // 0..6
-  // Добавим "пустые" слоты (для понедельника?)
+  const firstDayOffset = getDayOfWeek(dayInfos[0].date);
   const blankDays: DayInfo[] = [];
   for (let i = 0; i < firstDayOffset; i++) {
     blankDays.push({
-      date: new Date(0), // фиктивное
+      date: new Date(0),
       isoKey: `blank-${i}`,
       count: 0,
       records: [],
     });
   }
   const fullDayInfos = [...blankDays, ...dayInfos];
-
-  // теперь fullDayInfos.length % 7 даёт, сколько слотов в последнем неполном столбце
-  // будем итерировать по столбцам (неделям)
   const totalCols = Math.ceil(fullDayInfos.length / 7);
 
-  // Сформируем структуру: weeks[colIndex][rowIndex], где rowIndex = dayOfWeek(0..6)
   const weeks: DayInfo[][] = [];
   for (let c = 0; c < totalCols; c++) {
-    const colSlice = fullDayInfos.slice(c * 7, c * 7 + 7);
-    weeks.push(colSlice);
+    weeks.push(fullDayInfos.slice(c * 7, c * 7 + 7));
   }
 
-  // --- 4. Для day-of-week label и month label ---
-
-  // День недели: массив коротких названий (пон, вт, ср...)
+  // Дни недели, месяца
   const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-  // Функция для получения короткого имени месяца
   const monthNames = [
     "Jan",
     "Feb",
@@ -140,17 +143,13 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
     "Dec",
   ];
 
-  // Когда GitHub рисует «Oct», «Nov» над столбиками:
-  // он смотрит на первую дату в каждом столбце, и если месяц там сменился
-  // (или если это первая колонка в наборе), то рисует метку.
   function getMonthLabel(
     dayInfo: DayInfo,
     prevDayInfo?: DayInfo,
   ): string | null {
     if (!dayInfo || dayInfo.isoKey.startsWith("blank")) return null;
-    const m = dayInfo.date.getMonth(); // 0..11
+    const m = dayInfo.date.getMonth();
     if (!prevDayInfo || prevDayInfo.isoKey.startsWith("blank")) {
-      // первая колонка
       return monthNames[m];
     }
     const pm = prevDayInfo.date.getMonth();
@@ -160,35 +159,30 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
     return null;
   }
 
+  // 8-ступенчатая шкала
   function getColor(count: number) {
-    if (count === 0)
-      return "#161B22"; // 0  (очень тёмный/серый)
-    else if (count === 1)
-      return "#ecf8d3"; // 1
-    else if (count === 2)
-      return "#d4f1b7"; // 2
-    else if (count === 3)
-      return "#b8e48b"; // 3  (похож на #c6e48b, но чуть светлее/темнее)
-    else if (count === 4)
-      return "#9cd873"; // 4
-    else if (count === 5)
-      return "#7bc96f"; // 5
-    else if (count === 6)
-      return "#42ba60"; // 6
-    else if (count === 7)
-      return "#239a3b"; // 7
-    else return "#196127"; // 8 и больше
+    if (count === 0) return "#161B22";
+    if (count === 1) return "#ecf8d3";
+    if (count === 2) return "#d4f1b7";
+    if (count === 3) return "#b8e48b";
+    if (count === 4) return "#9cd873";
+    if (count === 5) return "#7bc96f";
+    if (count === 6) return "#42ba60";
+    if (count === 7) return "#239a3b";
+    return "#196127"; // 8+
   }
 
-  // --- 6. Построение UI ---
-
-  // Рендерим:
-  //  - слева отдельную колонку с надписями Mon, Wed, Fri (например, можно не все, а через 2)
-  //  - сверху над каждым столбцом (week) — подпись месяца, если нужно
-  //  - под каждым столбцом (или нигде) — года, если нужно
+  // При первом рендере прокручиваем вправо, чтобы видеть "свежие" дни
+  useEffect(() => {
+    const grid = document.getElementById("activity-grid");
+    if (grid) {
+      grid.scrollLeft = grid.scrollWidth;
+    }
+  }, []);
 
   return (
     <Box
+      id="activity-grid"
       style={{
         width: "100%",
         minWidth: "100px",
@@ -205,22 +199,19 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
           width: "400px",
         }}
       >
-        {/* Колонка с подписями дней (7 штук) */}
+        {/* Левая колонка с метками (Mon, Tue...) */}
         <div style={{ marginRight: 8, marginTop: 18 }}>
           {dayLabels.map((label, idx) => (
             <div
               key={label}
               style={{
-                height: 14, // совпадает с квадратиком + margin (14+2?)
+                height: 14,
                 marginBottom: 2,
                 fontSize: 10,
                 textAlign: "right",
                 fontFamily: "sans-serif",
               }}
             >
-              {/* Можно не все дни подписывать, а например только Mon, Wed, Fri */}
-              {/* if (idx===0 || idx===2 || idx===4) {label} */}
-              {/*{label}*/}
               {idx % 2 === 0 && label}
             </div>
           ))}
@@ -229,7 +220,6 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
         {/* Сетка недель */}
         <div style={{ display: "flex", fontFamily: "sans-serif" }}>
           {weeks.map((col, colIndex) => {
-            // месяц для подписи
             const firstDayInCol = col[0];
             const prevColLastDay = weeks[colIndex - 1]?.[0];
             const monthLabel = getMonthLabel(firstDayInCol, prevColLastDay);
@@ -243,7 +233,7 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
                   marginRight: 4,
                 }}
               >
-                {/* Отображаем название месяца (если оно есть) */}
+                {/* Подпись месяца */}
                 <div style={{ height: 10, marginBottom: 8 }}>
                   {monthLabel && (
                     <span style={{ fontSize: 10 }}>{monthLabel}</span>
@@ -251,45 +241,92 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
                 </div>
 
                 {col.map((dayInfo, rowIndex) => {
-                  // tooltip: если dayInfo.records.length>0, перечислить их
-                  let tooltip = "";
+                  // Если ячейка не "blank" и содержит записи
+                  // сортируем их по времени (самые ранние — сверху)
+                  // Для этого parseRecordDate, потом .sort((a,b)=...)
+                  let lines: string[] = [];
                   if (
                     !dayInfo.isoKey.startsWith("blank") &&
                     dayInfo.records.length > 0
                   ) {
-                    const lines = dayInfo.records.map((r, i) => {
-                      const shortComment = r.comment
-                        ? ` - ${r.comment.slice(0, 30)}...`
-                        : "";
-                      return `${i + 1}) ${r.technique} ${r.pattern}${shortComment}`;
+                    const sortedRecs = [...dayInfo.records].sort((a, b) => {
+                      // parse date
+                      const da = parseRecordDate(a.date);
+                      const db = parseRecordDate(b.date);
+                      if (!da || !db) return 0;
+                      return da.getTime() - db.getTime(); // ascending
                     });
 
-                    const summaryDuration = dayInfo.records.reduce(
+                    lines = sortedRecs.map((rec) => {
+                      const d = parseRecordDate(rec.date);
+                      let timeStr = "";
+                      if (d) {
+                        const hh = String(d.getHours()).padStart(2, "0");
+                        const mm = String(d.getMinutes()).padStart(2, "0");
+                        timeStr = `${hh}:${mm} `;
+                      }
+
+                      const shortComment = rec.comment
+                        ? ` - ${rec.comment.slice(0, 30)}...`
+                        : "";
+                      return `${timeStr}${rec.technique} ${rec.pattern}${shortComment}`;
+                    });
+                  }
+
+                  // Суммарная длительность по всем записям
+                  let summaryDuration = 0;
+                  if (dayInfo.records.length > 0) {
+                    summaryDuration = dayInfo.records.reduce(
                       (acc, rec) => acc + rec.duration,
                       0,
                     );
-
-                    const formattedDuration = formatMs(summaryDuration);
-
-                    tooltip = `${dayInfo.isoKey}\n${lines.join("\n")}\nTotal duration: ${formattedDuration} ms`;
-                  } else if (!dayInfo.isoKey.startsWith("blank")) {
-                    tooltip = `${dayInfo.isoKey}\n(no trainings)`;
                   }
 
+                  // Формируем содержимое тултипа
+                  // Можно вернуть элемент <Box> или <div>
+                  let tooltipContent: ReactNode = null;
+                  if (!dayInfo.isoKey.startsWith("blank")) {
+                    if (lines.length > 0) {
+                      tooltipContent = (
+                        <div style={{ whiteSpace: "pre-line" }}>
+                          <div>{dayInfo.isoKey}</div>
+                          <div>Total duration: {formatMs(summaryDuration)}</div>
+                          {lines.map((line, idx2) => (
+                            <div key={idx2}>{line}</div>
+                          ))}
+                        </div>
+                      );
+                    } else {
+                      tooltipContent = (
+                        <div>
+                          {dayInfo.isoKey}
+                          <div>(no trainings)</div>
+                        </div>
+                      );
+                    }
+                  }
+
+                  // Сам квадратик
                   return (
-                    <div
+                    <Tooltip
                       key={rowIndex}
-                      title={tooltip}
-                      style={{
-                        width: 14,
-                        height: 14,
-                        marginBottom: 2,
-                        backgroundColor: dayInfo.isoKey.startsWith("blank")
-                          ? "transparent"
-                          : getColor(dayInfo.count),
-                        borderRadius: 2,
-                      }}
-                    />
+                      title={tooltipContent || ""}
+                      arrow
+                      disableInteractive
+                    >
+                      <div
+                        style={{
+                          width: 14,
+                          height: 14,
+                          marginBottom: 2,
+                          backgroundColor: dayInfo.isoKey.startsWith("blank")
+                            ? "transparent"
+                            : getColor(dayInfo.count),
+                          borderRadius: 2,
+                          cursor: dayInfo.count > 0 ? "pointer" : "default",
+                        }}
+                      />
+                    </Tooltip>
                   );
                 })}
               </div>
@@ -300,11 +337,3 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
     </Box>
   );
 };
-
-// Вспомогательная функция
-function formatDate(d: Date) {
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}

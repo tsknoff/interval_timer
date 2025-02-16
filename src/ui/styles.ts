@@ -2,26 +2,26 @@ import { tss } from "tss-react/mui";
 
 export const useLayoutStyles = tss.create({
   root: {
-    position: "absolute",
     top: 0,
     left: 0,
     display: "flex",
-    width: "100%",
+    flexDirection: "column",
     height: "100vh",
     alignItems: "flex-start",
     background:
       "linear-gradient(to right top, #001a6e, #002579, #013184, #033c8f, #074799)",
-    overflow: "auto",
   },
   twoColumnsWrapper: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "flex-end",
-    width: "100%",
-    flexWrap: "wrap-reverse",
-    padding: "4rem",
-    gap: "10rem",
+    alignItems: "flex-start",
+    flexWrap: "wrap",
+    boxSizing: "border-box",
+    margin: "auto",
+    paddingTop: "4rem",
+    height: "calc(100vh - 64px)",
+    gap: "4rem",
   },
   secondColumnWrapper: {
     marginBottom: "1rem",

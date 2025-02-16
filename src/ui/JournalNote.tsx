@@ -133,16 +133,36 @@ export const JournalNote: FC<IProps> = ({ journalRecord }) => {
             marginBottom: 1,
           }}
         >
-          <Typography variant="body1" sx={{ fontWeight: 600 }}>
-            {journalRecord.technique}{" "}
-            <span
-              style={{
-                fontWeight: 400,
+          <Box
+            style={{
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+              {journalRecord.technique}
+            </Typography>
+            <AccessTimeIcon
+              sx={{
+                fontSize: 16,
+                verticalAlign: "middle",
+                marginRight: 0.5,
+                marginLeft: 2,
               }}
-            >
-              {journalRecord.pattern}
-            </span>{" "}
-          </Typography>
+            />
+            <Typography variant="body2" sx={{ opacity: 0.7 }}>
+              {durationText}
+            </Typography>
+            <img
+              src={"assets/metronome.svg"}
+              alt={"metronome"}
+              style={{ width: 12, height: 12, marginLeft: 15 }}
+            />
+            <Typography variant="body2" sx={{ marginLeft: 0.5 }}>
+              {journalRecord.bpm} BPM
+            </Typography>
+          </Box>
           <Typography variant="body2" sx={{ opacity: 0.7 }}>
             {timeAgoText}
           </Typography>
@@ -150,30 +170,26 @@ export const JournalNote: FC<IProps> = ({ journalRecord }) => {
 
         {/* Duration */}
         <Box sx={{ marginBottom: 1, display: "flex", alignItems: "center" }}>
-          <AccessTimeIcon
-            sx={{
-              fontSize: 16,
-              verticalAlign: "middle",
-              marginRight: 0.5,
+          <span
+            style={{
+              fontWeight: 400,
             }}
-          />
-          <Typography variant="body2" sx={{ opacity: 0.7 }}>
-            {durationText}
-          </Typography>
-          <img
-            src={"assets/metronome.svg"}
-            alt={"metronome"}
-            style={{ width: 12, height: 12, marginLeft: 15 }}
-          />
-          <Typography variant="body2" sx={{ marginLeft: 0.5 }}>
-            {journalRecord.bpm} BPM
-          </Typography>
+          >
+            {journalRecord.pattern}
+          </span>{" "}
         </Box>
 
         {/* Technique / Pattern / Description */}
         {journalRecord.description && (
           <Typography variant="body2" sx={{ marginTop: 1 }}>
             {journalRecord.description}
+          </Typography>
+        )}
+
+        {/* Комментарий */}
+        {journalRecord.comment && (
+          <Typography variant="body2" sx={{ marginTop: 1 }}>
+            {journalRecord.comment}
           </Typography>
         )}
 
@@ -200,13 +216,6 @@ export const JournalNote: FC<IProps> = ({ journalRecord }) => {
             />
           </Box>
         </Box>
-
-        {/* Комментарий */}
-        {journalRecord.comment && (
-          <Typography variant="body2" sx={{ marginTop: 1 }}>
-            {journalRecord.comment}
-          </Typography>
-        )}
       </CardContent>
     </Card>
   );
