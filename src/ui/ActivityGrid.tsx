@@ -49,6 +49,19 @@ type DayInfo = {
   records: JournalRecord[];
 };
 
+// 8-ступенчатая шкала
+export const getColor = (count: number) => {
+  if (count === 0) return "#161B22";
+  if (count === 1) return "#ecf8d3";
+  if (count === 2) return "#d4f1b7";
+  if (count === 3) return "#b8e48b";
+  if (count === 4) return "#9cd873";
+  if (count === 5) return "#7bc96f";
+  if (count === 6) return "#42ba60";
+  if (count === 7) return "#239a3b";
+  return "#196127"; // 8+
+};
+
 export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
   // --- 1. Сгруппировать записи по "YYYY-MM-DD" ---
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -159,19 +172,6 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
     return null;
   }
 
-  // 8-ступенчатая шкала
-  function getColor(count: number) {
-    if (count === 0) return "#161B22";
-    if (count === 1) return "#ecf8d3";
-    if (count === 2) return "#d4f1b7";
-    if (count === 3) return "#b8e48b";
-    if (count === 4) return "#9cd873";
-    if (count === 5) return "#7bc96f";
-    if (count === 6) return "#42ba60";
-    if (count === 7) return "#239a3b";
-    return "#196127"; // 8+
-  }
-
   // При первом рендере прокручиваем вправо, чтобы видеть "свежие" дни
   useEffect(() => {
     const grid = document.getElementById("activity-grid");
@@ -184,10 +184,10 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
     <Box
       id="activity-grid"
       style={{
-        width: "100%",
-        minWidth: "100px",
+        // width: "100%",
+        // minWidth: "100px",
         overflow: "auto",
-        border: "1px solid #ccc",
+        // border: "1px solid #ccc",
         padding: 16,
         borderRadius: 4,
       }}
@@ -196,7 +196,7 @@ export const ActivityGrid: FC<IActivityGridProps> = ({ journalRecords }) => {
         style={{
           display: "flex",
           color: "white",
-          width: "400px",
+          // width: "400px",
         }}
       >
         {/* Левая колонка с метками (Mon, Tue...) */}

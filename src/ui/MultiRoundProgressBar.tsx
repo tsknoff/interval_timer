@@ -33,6 +33,7 @@ export const MultiRoundProgressBar: React.FC<MultiRoundProgressBarProps> = ({
   return (
     <Box
       sx={{
+        maxWidth: "95vw",
         width: "100%", // ТУТ делаем "полноширинный" адаптивный блок
         height: 60,
         backgroundColor: "#eee",
