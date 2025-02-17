@@ -44,6 +44,7 @@ export const ResponsiveAppBar = () => {
       position="static"
       style={{
         height: "64px",
+        backgroundColor: "rgba(0,0,0,.5)",
       }}
     >
       <Container maxWidth="xl">

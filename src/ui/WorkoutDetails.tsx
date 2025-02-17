@@ -4,6 +4,7 @@ import {
   AccordionSummary,
   Box,
   Button,
+  Checkbox,
   FormControl,
   InputLabel,
   MenuItem,
@@ -11,7 +12,7 @@ import {
   Slider,
   TextField,
 } from "@mui/material";
-import { Settings } from "./Settings.tsx";
+import { RoundsSettings } from "./RoundsSettings.tsx";
 import { FC } from "react";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -19,6 +20,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import { TimerItem } from "../dataFlow/TimerListModel.ts";
+import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 interface IWorkoutDetails {
   technique: string;
@@ -26,6 +28,8 @@ interface IWorkoutDetails {
   description: string;
   rounds: TimerItem[][];
   bpm: number;
+  muteMetronome: boolean;
+  setMuteMetronome: (muteMetronome: boolean) => void;
   setTechnique: (technique: string) => void;
   setPattern: (pattern: string) => void;
   setDescription: (description: string) => void;
@@ -41,6 +45,8 @@ export const WorkoutDetails: FC<IWorkoutDetails> = ({
   description,
   rounds,
   bpm,
+  muteMetronome,
+  setMuteMetronome,
   setTechnique,
   setPattern,
   setDescription,
@@ -161,7 +167,7 @@ export const WorkoutDetails: FC<IWorkoutDetails> = ({
           }}
         />
         {/* Settings для редактирования rounds */}
-        <Settings rounds={rounds} setRounds={setRounds} />
+        <RoundsSettings rounds={rounds} setRounds={setRounds} />
         {/* BPM */}
         <Accordion
           disableGutters={true}
@@ -209,14 +215,30 @@ export const WorkoutDetails: FC<IWorkoutDetails> = ({
                 step={1}
                 onClick={(e) => e.stopPropagation()}
                 sx={{
-                  width: 200,
+                  width: 120,
                 }}
               />
             </Box>
           </AccordionSummary>
           <AccordionDetails>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
+            <Box
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <VolumeUpIcon />
+              Disable sound
+              <Checkbox
+                checked={muteMetronome}
+                onChange={(e) => setMuteMetronome(e.target.checked)}
+                sx={{
+                  color: "white",
+                }}
+              />
+            </Box>
           </AccordionDetails>
         </Accordion>
         {/* Кнопки Start/Reset */}

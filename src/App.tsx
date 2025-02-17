@@ -73,7 +73,8 @@ export const App: React.FC = () => {
   // RoundListModel ref
   const roundListRef = useRef<RoundListModel | null>(null);
 
-  useMetronome(bpm, isPlayingMetronome, 1, false, 2, false);
+  const [muteMetronome, setMuteMetronome] = useState(false);
+  useMetronome(bpm, isPlayingMetronome, 1, false, 2, muteMetronome);
 
   // 1) Load from localStorage on mount
   useEffect(() => {
@@ -186,6 +187,8 @@ export const App: React.FC = () => {
               description={description}
               rounds={rounds}
               bpm={bpm}
+              muteMetronome={muteMetronome}
+              setMuteMetronome={setMuteMetronome}
               setTechnique={setTechnique}
               setPattern={setPattern}
               setDescription={setDescription}
@@ -195,18 +198,26 @@ export const App: React.FC = () => {
               handleReset={handleReset}
             />
           </Box>
-
-          <MultiRoundProgressBar
-            rounds={rounds}
-            currentRoundIndex={roundIndex}
-            currentTimerIndex={timerIndex}
-            timerRemaining={timerRemaining}
-          />
+          <Box
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              color: "white",
+              fontFamily: "sans-serif",
+            }}
+          >
+            <MultiRoundProgressBar
+              rounds={rounds}
+              currentRoundIndex={roundIndex}
+              currentTimerIndex={timerIndex}
+              timerRemaining={timerRemaining}
+            />
+          </Box>
           <ActivityGrid journalRecords={journal} />
         </Box>
         <JournalList journal={journal} />
       </Box>
-      {/* Диалог после завершения (Review) */}
       <DialogWorkoutReview
         showReviewDialog={showReviewDialog}
         trainingRating={trainingRating}

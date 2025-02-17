@@ -9,6 +9,173 @@ createRoot(document.getElementById("root")!).render(
 
 // const backup = [
 //   {
+//     date: "17.02.2025, 08:24:05",
+//     technique: "Legato",
+//     pattern: "2-3-5",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Play", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 130,
+//     rating: 88,
+//   },
+//   {
+//     date: "17.02.2025, 08:13:12",
+//     technique: "Legato",
+//     pattern: "Treli #2",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Play", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 120,
+//     rating: 63,
+//     comment:
+//       "Очень устают безымянный и мезинец но удалось спуститься поднятиься несоклько раз",
+//   },
+//   {
+//     date: "17.02.2025, 08:05:39",
+//     technique: "Legato",
+//     pattern: "Treli #1",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Play", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 130,
+//     rating: 81,
+//     comment: "Temp ok, очень тяжело сделать pull_off на 4 струне мезинцем",
+//   },
+//   {
+//     date: "17.02.2025, 07:57:21",
+//     technique: "Legato",
+//     pattern: "1-2-3-4",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Play", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 100,
+//     rating: 76,
+//   },
+//   {
+//     date: "17.02.2025, 07:50:45",
+//     technique: "Warmup",
+//     pattern: "",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Steps", duration: 300000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Chords", duration: 300000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Arpeggio-Legato", duration: 300000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 920000,
+//     bpm: 80,
+//     rating: 78,
+//   },
+//   {
+//     date: "16.02.2025, 17:03:47",
+//     technique: "Legato",
+//     pattern: "Treli #2",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Play", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 120,
+//     rating: 51,
+//     comment:
+//       "Получилось 1/8 триолями, 1/16 - очень уставала рука и шум на 5-6 струне",
+//   },
+//   {
+//     date: "16.02.2025, 16:55:18",
+//     technique: "Legato",
+//     pattern: "",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Steps", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Chords", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "LegatoArpegio", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 130,
+//     rating: 84,
+//     comment: "130 BPM нормально получаются",
+//   },
+//   {
 //     date: "16.02.2025, 11:55:30",
 //     technique: "Legato",
 //     pattern: "Treli #2",

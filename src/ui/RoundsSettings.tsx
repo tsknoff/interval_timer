@@ -2,9 +2,9 @@
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import SettingsIcon from "@mui/icons-material/Settings";
+import TimerIcon from "@mui/icons-material/Timer";
 
-import React from "react";
+import { FC } from "react";
 import { TimerItem } from "../dataFlow/TimerListModel.ts";
 import {
   Accordion,
@@ -15,7 +15,10 @@ import {
   FormControl,
   IconButton,
   InputAdornment,
+  InputLabel,
+  MenuItem,
   OutlinedInput,
+  Select,
   Typography,
 } from "@mui/material";
 
@@ -24,11 +27,16 @@ interface IProps {
   setRounds: (rounds: TimerItem[][]) => void;
 }
 
+export interface IWorkoutPreset {
+  name: string;
+  timers: TimerItem[][];
+}
+
 /**
  * Компонент для редактирования массива "раундов" (TimerItem[][]).
  * Позволяет добавлять/удалять раунды и таймеры, изменять name и duration.
  */
-export const Settings: React.FC<IProps> = ({ rounds, setRounds }) => {
+export const RoundsSettings: FC<IProps> = ({ rounds, setRounds }) => {
   // Добавить новый раунд (пустой или с одним таймером — на ваш выбор)
   const handleAddRound = () => {
     const newRounds = [...rounds];
@@ -60,6 +68,45 @@ export const Settings: React.FC<IProps> = ({ rounds, setRounds }) => {
     );
     setRounds(newRounds);
   };
+
+  const workoutPresets: IWorkoutPreset[] = [
+    {
+      name: "1m-2m-2m",
+      timers: [
+        [{ name: "Ready ?", duration: 5000 }],
+        [
+          { name: "Play", duration: 60000 },
+          { name: "Relax", duration: 5000 },
+        ],
+        [
+          { name: "Play", duration: 120000 },
+          { name: "Relax", duration: 5000 },
+        ],
+        [
+          { name: "Play", duration: 120000 },
+          { name: "Relax", duration: 5000 },
+        ],
+      ],
+    },
+    {
+      name: "Warm-up",
+      timers: [
+        [{ name: "Ready ?", duration: 5000 }],
+        [
+          { name: "Steps", duration: 300000 },
+          { name: "Relax", duration: 5000 },
+        ],
+        [
+          { name: "Chords", duration: 300000 },
+          { name: "Relax", duration: 5000 },
+        ],
+        [
+          { name: "Arpeggio-Legato", duration: 300000 },
+          { name: "Relax", duration: 5000 },
+        ],
+      ],
+    },
+  ];
 
   // Изменить поле `name` или `duration` у конкретного таймера
   const handleTimerChange = (
@@ -118,8 +165,41 @@ export const Settings: React.FC<IProps> = ({ rounds, setRounds }) => {
             alignItems: "center",
           }}
         >
-          <SettingsIcon />
+          <TimerIcon />
           <h3>Round's settings</h3>
+          <FormControl sx={{ m: 1, minWidth: 120 }}>
+            <InputLabel
+              id="demo-simple-select-helper-label"
+              style={{
+                color: "white",
+              }}
+            >
+              Presets
+            </InputLabel>
+            <Select
+              variant={"outlined"}
+              size={"small"}
+              style={{
+                color: "white",
+              }}
+              defaultValue={workoutPresets[0].name}
+              onClick={(e) => e.stopPropagation()}
+              onChange={(e) => {
+                const preset = workoutPresets.find(
+                  (p) => p.name === e.target.value,
+                );
+                if (preset) {
+                  setRounds(preset.timers);
+                }
+              }}
+            >
+              {workoutPresets.map((preset) => (
+                <MenuItem key={preset.name} value={preset.name}>
+                  {preset.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
       </AccordionSummary>
       <AccordionDetails>

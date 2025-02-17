@@ -2,14 +2,17 @@ import { tss } from "tss-react/mui";
 
 export const useLayoutStyles = tss.create({
   root: {
-    top: 0,
-    left: 0,
-    display: "flex",
-    flexDirection: "column",
-    height: "100vh",
-    alignItems: "flex-start",
+    // position: "absolute",
+    // top: 0,
+    // left: 0,
+    // width: "100%",
+    // display: "flex",
+    // flexDirection: "column",
+    // height: "fit-content",
+    // alignItems: "flex-start",
     background:
       "linear-gradient(to right top, #001a6e, #002579, #013184, #033c8f, #074799)",
+    minHeight: "100vh",
   },
   twoColumnsWrapper: {
     display: "flex",
@@ -20,7 +23,7 @@ export const useLayoutStyles = tss.create({
     boxSizing: "border-box",
     margin: "auto",
     paddingTop: "4rem",
-    height: "calc(100vh - 64px)",
+    // height: "calc(100vh - 64px)",
     gap: "4rem",
   },
   secondColumnWrapper: {
