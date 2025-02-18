@@ -9,6 +9,205 @@ createRoot(document.getElementById("root")!).render(
 
 // const backup = [
 //   {
+//     date: "18.02.2025, 11:54:59",
+//     technique: "Legato",
+//     pattern: "Treli #2",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Play", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 100,
+//     rating: 86,
+//     comment: "Попробовать с след раз 110",
+//   },
+//   {
+//     date: "18.02.2025, 11:47:15",
+//     technique: "Legato",
+//     pattern: "5-7-9",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Play", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 130,
+//     rating: 50,
+//     comment: "Устала мышца под большим пальцем",
+//   },
+//   {
+//     date: "18.02.2025, 11:39:26",
+//     technique: "Legato",
+//     pattern: "Treli #1",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Play", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 130,
+//     rating: 90,
+//     comment: "Можно попробовать 140 BPM",
+//   },
+//   {
+//     date: "18.02.2025, 11:30:50",
+//     technique: "Legato",
+//     pattern: "1-3-2-4",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Play", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 100,
+//     rating: 82,
+//   },
+//   {
+//     date: "18.02.2025, 11:22:47",
+//     technique: "Warmup",
+//     pattern: "",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Steps", duration: 300000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Chords", duration: 300000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Arpeggio-Legato", duration: 300000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 920000,
+//     bpm: 80,
+//     rating: 79,
+//   },
+//   {
+//     date: "17.02.2025, 19:48:25",
+//     technique: "Legato",
+//     pattern: "treli #2",
+//     rounds: [[{ name: "Play", duration: 4020000 }]],
+//     duration: 4020000,
+//     bpm: 110,
+//     rating: 80,
+//   },
+//   {
+//     date: "17.02.2025, 18:41:25",
+//     technique: "Legato",
+//     pattern: "treli #2 pinky",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Play", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 110,
+//     rating: 86,
+//   },
+//   {
+//     date: "17.02.2025, 15:28:02",
+//     technique: "Legato",
+//     pattern: "Treli #1",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Play", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 100,
+//     rating: 90,
+//     comment: "В целом легко",
+//   },
+//   {
+//     date: "17.02.2025, 15:19:58",
+//     technique: "Legato",
+//     pattern: "Treli #2",
+//     rounds: [
+//       [{ name: "Ready ?", duration: 5000 }],
+//       [
+//         { name: "Play", duration: 60000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//       [
+//         { name: "Play", duration: 120000 },
+//         { name: "Relax", duration: 5000 },
+//       ],
+//     ],
+//     duration: 320000,
+//     bpm: 100,
+//     rating: 88,
+//     comment:
+//       "В следующий раз играть 100BPM получается хорошо, усталость чуствуется и пальцы перестают двигаться",
+//   },
+//   {
 //     date: "17.02.2025, 08:24:05",
 //     technique: "Legato",
 //     pattern: "2-3-5",
@@ -625,3 +824,22 @@ createRoot(document.getElementById("root")!).render(
 //     duration: 300000,
 //   },
 // ];
+
+// const a = {
+//   name: "1m-2m-2m",
+//   rounds: [
+//     [{ name: "Ready ?", duration: 5000 }],
+//     [
+//       { name: "Play", duration: 60000 },
+//       { name: "Relax", duration: 5000 },
+//     ],
+//     [
+//       { name: "Play", duration: 120000 },
+//       { name: "Relax", duration: 5000 },
+//     ],
+//     [
+//       { name: "Play", duration: 120000 },
+//       { name: "Relax", duration: 5000 },
+//     ],
+//   ],
+// };

@@ -35,11 +35,12 @@ export const MultiRoundProgressBar: React.FC<MultiRoundProgressBarProps> = ({
       sx={{
         maxWidth: "95vw",
         width: "100%", // ТУТ делаем "полноширинный" адаптивный блок
-        height: 60,
+        height: "60px",
         backgroundColor: "#eee",
         display: "flex",
-        border: "4px solid white",
-        borderRadius: 20,
+        boxSizing: "border-box",
+        border: "2px solid white",
+        borderRadius: "20px",
         overflow: "hidden",
       }}
     >

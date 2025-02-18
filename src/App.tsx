@@ -8,7 +8,7 @@ import { RoundListModel } from "./dataFlow/RoundListModel";
 import { MultiRoundProgressBar } from "./ui/MultiRoundProgressBar";
 import { useMetronome } from "./hooks/useMetronome";
 import { playAllRoundsEndSound } from "./utils/audioUtils";
-import { ActivityGrid, getColor } from "./ui/ActivityGrid.tsx";
+import { ActivityGrid } from "./ui/ActivityGrid.tsx";
 import { WorkoutDetails } from "./ui/WorkoutDetails.tsx";
 import { TimerCircle } from "./ui/TimerCircle.tsx";
 import { JournalList } from "./ui/JournalList.tsx";
@@ -16,6 +16,7 @@ import { DialogWorkoutReview } from "./ui/DialogWorkoutReview.tsx";
 import { useLayoutStyles } from "./ui/styles.ts";
 import { ResponsiveAppBar } from "./ui/ResponsiveAppBar.tsx";
 import { TrainingStreak } from "./ui/TrainingStreak.tsx";
+import { ActivityGridLegend } from "./ui/ActivityGridLegend.tsx";
 
 export interface JournalRecord {
   date: string;
@@ -206,109 +207,19 @@ export const App: React.FC = () => {
               flexDirection: "column",
               color: "white",
               fontFamily: "sans-serif",
+              gap: ".5rem",
             }}
-          >
-            <MultiRoundProgressBar
-              rounds={rounds}
-              currentRoundIndex={roundIndex}
-              currentTimerIndex={timerIndex}
-              timerRemaining={timerRemaining}
-            />
-          </Box>
-          <Box
-            style={{
-              border: "1px solid white",
-              fontFamily: "sans-serif",
-              color: "white",
-              maxWidth: "95vw",
-              width: "100%",
-              overflow: "hidden",
-              boxSizing: "border-box",
-              display: "flex",
-              flexDirection: "column",
-              padding: "10px",
-              borderRadius: "10px",
-              // marginLeft: "5px",
-            }}
-          >
+          ></Box>
+          <MultiRoundProgressBar
+            rounds={rounds}
+            currentRoundIndex={roundIndex}
+            currentTimerIndex={timerIndex}
+            timerRemaining={timerRemaining}
+          />
+          <Box className={classes.activityGridWrapper}>
             <TrainingStreak journal={journal} />
             <ActivityGrid journalRecords={journal} />
-            <Box
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: 4,
-                fontFamily: "sans-serif",
-                color: "white",
-                alignSelf: "flex-end",
-              }}
-            >
-              Less
-              <div
-                style={{
-                  width: 14,
-                  height: 14,
-                  marginBottom: 2,
-                  backgroundColor: getColor(1),
-                  borderRadius: 2,
-                }}
-              />
-              <div
-                style={{
-                  width: 14,
-                  height: 14,
-                  marginBottom: 2,
-                  backgroundColor: getColor(2),
-                  borderRadius: 2,
-                }}
-              />
-              <div
-                style={{
-                  width: 14,
-                  height: 14,
-                  marginBottom: 2,
-                  backgroundColor: getColor(3),
-                  borderRadius: 2,
-                }}
-              />
-              <div
-                style={{
-                  width: 14,
-                  height: 14,
-                  marginBottom: 2,
-                  backgroundColor: getColor(4),
-                  borderRadius: 2,
-                }}
-              />
-              <div
-                style={{
-                  width: 14,
-                  height: 14,
-                  marginBottom: 2,
-                  backgroundColor: getColor(5),
-                  borderRadius: 2,
-                }}
-              />
-              <div
-                style={{
-                  width: 14,
-                  height: 14,
-                  marginBottom: 2,
-                  backgroundColor: getColor(6),
-                  borderRadius: 2,
-                }}
-              />
-              <div
-                style={{
-                  width: 14,
-                  height: 14,
-                  marginBottom: 2,
-                  backgroundColor: getColor(7),
-                  borderRadius: 2,
-                }}
-              />
-              More
-            </Box>
+            <ActivityGridLegend />
           </Box>
         </Box>
         <JournalList journal={journal} />

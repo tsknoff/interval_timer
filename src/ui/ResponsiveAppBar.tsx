@@ -13,8 +13,9 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import MusicVideoIcon from "@mui/icons-material/MusicVideo";
 
-const pages = ["How to use?", "Pricing", "Blog"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const pages = ["How to use?", "Pricing", "Community", "Contributors"];
+
+const settings = ["Dashboard", "Profile", "Account", "Achievements", "Logout"];
 
 export const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(

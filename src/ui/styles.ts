@@ -2,14 +2,6 @@ import { tss } from "tss-react/mui";
 
 export const useLayoutStyles = tss.create({
   root: {
-    // position: "absolute",
-    // top: 0,
-    // left: 0,
-    // width: "100%",
-    // display: "flex",
-    // flexDirection: "column",
-    // height: "fit-content",
-    // alignItems: "flex-start",
     background:
       "linear-gradient(to right top, #001a6e, #002579, #013184, #033c8f, #074799)",
     minHeight: "100vh",
@@ -22,8 +14,7 @@ export const useLayoutStyles = tss.create({
     flexWrap: "wrap",
     boxSizing: "border-box",
     margin: "auto",
-    paddingTop: "4rem",
-    // height: "calc(100vh - 64px)",
+    paddingTop: "2rem",
     gap: "4rem",
   },
   secondColumnWrapper: {
@@ -41,5 +32,18 @@ export const useLayoutStyles = tss.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: "10rem",
+  },
+  activityGridWrapper: {
+    border: "1px solid white",
+    fontFamily: "sans-serif",
+    color: "white",
+    maxWidth: "95vw",
+    width: "100%",
+    overflow: "hidden",
+    boxSizing: "border-box",
+    display: "flex",
+    flexDirection: "column",
+    padding: "10px",
+    borderRadius: "10px",
   },
 });
