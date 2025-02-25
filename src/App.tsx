@@ -17,6 +17,7 @@ import { useLayoutStyles } from "./ui/styles.ts";
 import { ResponsiveAppBar } from "./ui/ResponsiveAppBar.tsx";
 import { TrainingStreak } from "./ui/TrainingStreak.tsx";
 import { ActivityGridLegend } from "./ui/ActivityGridLegend.tsx";
+import { AdvancedStatistics } from "./ui/AdvancedStatistics.tsx";
 
 export interface JournalRecord {
   date: string;
@@ -223,6 +224,30 @@ export const App: React.FC = () => {
           </Box>
         </Box>
         <JournalList journal={journal} />
+        <Box
+          style={{
+            position: "relative",
+            margin: "16rem",
+            boxSizing: "border-box",
+            marginTop: "2rem",
+            height: "600px",
+            borderRadius: "20px",
+            overflow: "hidden",
+          }}
+        >
+          <AdvancedStatistics records={journal} />
+          <Box
+            style={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              width: "100%",
+              height: "60%",
+              boxShadow: "0 0 100px 100px rgba(2, 36, 120, 0.9)",
+              backgroundColor: "rgba(2, 36, 120, .95)", // Same color but rgba(2, 36, 120, 0.8)
+            }}
+          />
+        </Box>
       </Box>
       <DialogWorkoutReview
         showReviewDialog={showReviewDialog}
