@@ -3,8 +3,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Box } from "@mui/material";
 
-import { TimerItem } from "./dataFlow/TimerListModel";
-import { RoundListModel } from "./dataFlow/RoundListModel";
+import { TimerItem } from "./dataFlow/models/TimerListModel.ts";
+import { RoundListModel } from "./dataFlow/models/RoundListModel.ts";
 import { MultiRoundProgressBar } from "./ui/MultiRoundProgressBar";
 import { useMetronome } from "./hooks/useMetronome";
 import { playAllRoundsEndSound } from "./utils/audioUtils";
@@ -200,16 +200,16 @@ export const App: React.FC = () => {
               handleReset={handleReset}
             />
           </Box>
-          <Box
-            style={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              color: "white",
-              fontFamily: "sans-serif",
-              gap: ".5rem",
-            }}
-          ></Box>
+          {/*<Box*/}
+          {/*  style={{*/}
+          {/*    width: "100%",*/}
+          {/*    display: "flex",*/}
+          {/*    flexDirection: "column",*/}
+          {/*    color: "white",*/}
+          {/*    fontFamily: "sans-serif",*/}
+          {/*    gap: ".5rem",*/}
+          {/*  }}*/}
+          {/*></Box>*/}
           <MultiRoundProgressBar
             rounds={rounds}
             currentRoundIndex={roundIndex}

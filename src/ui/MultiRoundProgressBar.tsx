@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Box } from "@mui/material";
-import { TimerItem } from "../dataFlow/TimerListModel";
+import { TimerItem } from "../dataFlow/models/TimerListModel.ts";
 
 function sumRoundTimers(round: TimerItem[]): number {
   return round.reduce((acc, item) => acc + item.duration, 0);

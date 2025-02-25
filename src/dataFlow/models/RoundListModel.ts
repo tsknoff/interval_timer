@@ -1,7 +1,10 @@
 // RoundListModel.ts
 
 import { TimerListModel, TimerItem } from "./TimerListModel.ts";
-import { playRoundEndSound, playTimerEndSound } from "../utils/audioUtils.ts";
+import {
+  playRoundEndSound,
+  playTimerEndSound,
+} from "../../utils/audioUtils.ts";
 
 /**
  * Тип коллбэка подписки:

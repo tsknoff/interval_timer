@@ -27,11 +27,11 @@ export const useLayoutStyles = tss.create({
   circleAndDetailsWrapper: {
     width: "100%",
     display: "flex",
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: "10rem",
+    gap: "5rem",
   },
   activityGridWrapper: {
     border: "1px solid white",

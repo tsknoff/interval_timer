@@ -5,7 +5,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import TimerIcon from "@mui/icons-material/Timer";
 
 import { FC } from "react";
-import { TimerItem } from "../dataFlow/TimerListModel.ts";
+import { TimerItem } from "../dataFlow/models/TimerListModel.ts";
 import {
   Accordion,
   AccordionDetails,

@@ -19,7 +19,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
-import { TimerItem } from "../dataFlow/TimerListModel.ts";
+import { TimerItem } from "../dataFlow/models/TimerListModel.ts";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 interface IWorkoutDetails {
